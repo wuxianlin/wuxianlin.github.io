@@ -1,6 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[OPPO R17 Pro 解锁 BootLoader & root]]></title>
+    <url>%2F2018%2F11%2F08%2Foppo-r17pro-root%2F</url>
+    <content type="text"><![CDATA[OPPO 即将开放 R17 Pro 申请解锁 BootLoader ，需要玩机的你准备好了吗？ 开篇三问你知道什么是解锁 BootLoader，什么是 root 权限吗？如果不知道，那建议你不要解锁 BootLoader，更不要 root. 你会使用 adb 和 fastboot 吗？你会使用 TWRP 吗？你会双清、卡刷等刷机操作吗？如果不会，那建议你不要解锁 BootLoader，更不要 root. 你解锁 Bootloader &amp; root 后要做什么？如果你连要做什么都不知道，奉劝你不要抱着好奇的心态进行尝试. 重要的事情说三遍玩机有风险，刷机需谨慎. 仔细阅读官方网站注意事项. 手机不开机、数据丢失等严重后果请自负，官方售后可帮你刷回官方固件. 申请OPPO 帐号如果你没有 OPPO 账号，那马上注册一个吧.https://id.oppo.com 下载申请 APP从R17 Pro 申请解锁 BootLoader 官方网站下载解锁申请 APP.安装到手机. 申请打开申请 APP，按照提示进行操作. 等待官方审核. 等待下发解锁权限. 下发解锁权限后，就可以进行下面的解锁操作咯. 备份设置，其他设置，备份与恢复，将重要的数据进行备份，然后将内置存储 Backup 目录拷贝到电脑.同时可以将非常重要的数据如联系人通话记录短信等进行云备份.解锁 BootLoader 后进行自己需要的玩机操作后可自行恢复数据. 解锁设置设置，关于手机，连续点击版本号，提示已打开开发者选项. 设置，其他设置，开发者选项，打开 OEM 解锁和 USB 调试. adb &amp; fastboot 命令重启进入 Fastboot 模式. 1adb reboot bootloader 看到 DEVICE STATE ：locked，说明此时 BootLoader 处于锁定状态. 开始解锁咯！1fastboot flashing unlock 或者 1fastboot flashing unlock_critical 询问是否解锁，确认解锁就使用音量键选择 UNLOCK THE BOOTLOADER，否则选择 DO NOT UNLOCK THE BOOTLOADER (此时后悔还来得及)，电源键确认. 手机会重启进入 recovery 模式格式化 data 分区，然后自动开机. 1adb reboot bootloader 再次进入 Fastboot 模式，可看到 DEVICE STATE ：unlocked，说明此时 BootLoader 处于解锁状态，此时你就可以使用 fastboot flash [分区名] [文件路径]为所欲为了. 玩机刷入 TWRP在 FastBoot 模式. 将 twrp.img 刷入 recovery 分区. 1fastboot flash recovery twrp.img 音量键选择 recovery mode，按电源键确认，进入 TWRP . 刷入 SuperSU将网盘中的 SuperSU 补丁放入内置存储空间，使用 TWRP recovery 刷入即可实现 root . 其他补丁也可使用相同方法刷入，实现 xposed 等玩机功能.]]></content>
+      <categories>
+        <category>root</category>
+      </categories>
+      <tags>
+        <tag>root</tag>
+        <tag>BootLoader</tag>
+        <tag>OPPO</tag>
+        <tag>R17Pro</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[OPPO Find X 解锁 BootLoader & root]]></title>
+    <url>%2F2018%2F09%2F22%2Foppo-findx-root%2F</url>
+    <content type="text"><![CDATA[OPPO 即将开放 Find X 申请解锁 BootLoader ，需要玩机的你准备好了吗？ 开篇三问你知道什么是解锁 BootLoader，什么是 root 权限吗？如果不知道，那建议你不要解锁 BootLoader，更不要 root. 你会使用 adb 和 fastboot 吗？你会使用 TWRP 吗？你会双清、卡刷等刷机操作吗？如果不会，那建议你不要解锁 BootLoader，更不要 root. 你解锁 Bootloader &amp; root 后要做什么？如果你连要做什么都不知道，奉劝你不要抱着好奇的心态进行尝试. 重要的事情说三遍玩机有风险，刷机需谨慎. 仔细阅读官方网站注意事项. 手机不开机、数据丢失等严重后果请自负，官方售后可帮你刷回官方固件. 申请OPPO 帐号如果你没有 OPPO 账号，那马上注册一个吧.https://id.oppo.com 下载申请 APP从Find X 申请解锁 BootLoader 官方网站下载解锁申请 APP.安装到手机. 申请打开申请 APP，按照提示进行操作. 等待官方审核. 等待下发解锁权限. 下发解锁权限后，就可以进行下面的解锁操作咯. 备份设置，其他设置，备份与恢复，将重要的数据进行备份，然后将内置存储 Backup 目录拷贝到电脑.同时可以将非常重要的数据如联系人通话记录短信等进行云备份.解锁 BootLoader 后进行自己需要的玩机操作后可自行恢复数据. 解锁设置设置，关于手机，连续点击版本号，提示已打开开发者选项. 设置，其他设置，开发者选项，打开 OEM 解锁和 USB 调试. adb &amp; fastboot 命令重启进入 Fastboot 模式. 1adb reboot bootloader 看到 DEVICE STATE ：locked，说明此时 BootLoader 处于锁定状态. 开始解锁咯！1fastboot flashing unlock 或者 1fastboot flashing unlock_critical 询问是否解锁，确认解锁就使用音量键选择 UNLOCK THE BOOTLOADER，否则选择 DO NOT UNLOCK THE BOOTLOADER (此时后悔还来得及)，电源键确认. 手机会重启进入 recovery 模式格式化 data 分区，然后自动开机. 1adb reboot bootloader 再次进入 Fastboot 模式，可看到 DEVICE STATE ：unlocked，说明此时 BootLoader 处于解锁状态，此时你就可以使用 fastboot flash [分区名] [文件路径]为所欲为了. 玩机刷入 TWRP在 FastBoot 模式. 将 twrp.img 刷入 recovery 分区. 1fastboot flash recovery twrp.img 音量键选择 recovery mode，按电源键确认，进入 TWRP . 刷入 SuperSU将网盘中的 SuperSU 补丁放入内置存储空间，使用 TWRP recovery 刷入即可实现 root . 其他补丁也可使用相同方法刷入，实现 xposed 等玩机功能.]]></content>
+      <categories>
+        <category>root</category>
+      </categories>
+      <tags>
+        <tag>root</tag>
+        <tag>BootLoader</tag>
+        <tag>OPPO</tag>
+        <tag>FindX</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[本站介绍]]></title>
     <url>%2F2018%2F08%2F08%2Fhello-world%2F</url>
     <content type="text"><![CDATA[本站为 wuxianlin 个人网站，有意见欢迎来提，有问题欢迎来问，更欢迎志同道合的朋友一起交流. 你知道吗资源转移你以前来这里查找玩机资源，现在转移到玩机页面了. 百度云你以前通过百度云共享关注最新玩机资源，现在需要关注百度云后在 APP 端查看动态. 聊一聊我玩手机玩平板，玩电视广播机顶盒，玩卫星有线无线，玩视频音乐，，，刷微博不刷朋友圈，玩小游戏不玩大游戏，打小球不打大球，会写代码不会写作文，会数学物理不会语文英语，看电视剧不看小说，，，关注 科技，，， 关注 Android 尤其是 root ，，，关注 OPPO(OnePlus/Realme) ，，， 联系wuxianlin Weibowuxianlin GitHub]]></content>
