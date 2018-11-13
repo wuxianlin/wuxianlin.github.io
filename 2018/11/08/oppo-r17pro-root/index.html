@@ -121,7 +121,7 @@
 <meta property="og:image" content="https://wuxianlin.com/2018/11/08/oppo-r17pro-root/r17pro-bootloader-unlocked.jpg">
 <meta property="og:image" content="https://wuxianlin.com/2018/11/08/oppo-r17pro-root/r17pro-twrp-mode.jpg">
 <meta property="og:image" content="https://wuxianlin.com/2018/11/08/oppo-r17pro-root/r17pro-twrp-recovery.jpg">
-<meta property="og:updated_time" content="2018-11-09T06:51:00.463Z">
+<meta property="og:updated_time" content="2018-11-12T07:06:54.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="OPPO R17 Pro 解锁 BootLoader &amp; root">
 <meta name="twitter:description" content="OPPO 即将开放 R17 Pro 申请解锁 BootLoader ，需要玩机的你准备好了吗？ 开篇三问你知道什么是解锁 BootLoader，什么是 root 权限吗？如果不知道，那建议你不要解锁 BootLoader，更不要 root. 你会使用 adb 和 fastboot 吗？你会使用 TWRP 吗？你会双清、卡刷等刷机操作吗？如果不会，那建议你不要解锁 BootLoader，更不要 ro">
@@ -480,7 +480,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2018-11-09 14:51:00" itemprop="dateModified" datetime="2018-11-09T14:51:00+08:00">2018-11-09</time>
+                <time title="修改时间：2018-11-12 15:06:54" itemprop="dateModified" datetime="2018-11-12T15:06:54+08:00">2018-11-12</time>
               
             
           </span>
@@ -545,16 +545,17 @@
 <h3 id="重要的事情说三遍"><a href="#重要的事情说三遍" class="headerlink" title="重要的事情说三遍"></a>重要的事情说三遍</h3><p>玩机有风险，刷机需谨慎.</p>
 <p>仔细阅读官方网站<a href="">注意事项</a>.</p>
 <p>手机不开机、数据丢失等严重后果请自负，<a href="http://www.oppo.com/cn/service/map" target="_blank" rel="noopener">官方售后</a>可帮你刷回官方固件.</p>
-<h3 id="申请"><a href="#申请" class="headerlink" title="申请"></a>申请</h3><h4 id="OPPO-帐号"><a href="#OPPO-帐号" class="headerlink" title="OPPO 帐号"></a>OPPO 帐号</h4><p>如果你没有 OPPO 账号，那马上注册一个吧.<br><a href="https://id.oppo.com" target="_blank" rel="noopener">https://id.oppo.com</a></p>
+<h3 id="申请"><a href="#申请" class="headerlink" title="申请"></a>申请</h3><h4 id="OPPO-帐号"><a href="#OPPO-帐号" class="headerlink" title="OPPO 帐号"></a>OPPO 帐号</h4><p>如果你没有 OPPO 账号，那马上注册一个吧,<a href="https://id.oppo.com" target="_blank" rel="noopener">https://id.oppo.com</a>.</p>
 <h4 id="下载申请-APP"><a href="#下载申请-APP" class="headerlink" title="下载申请 APP"></a>下载申请 APP</h4><p>从<a href="">R17 Pro 申请解锁 BootLoader 官方网站</a>下载解锁申请 APP.<br>安装到手机.</p>
 <h4 id="申请-1"><a href="#申请-1" class="headerlink" title="申请"></a>申请</h4><p>打开申请 APP，按照提示进行操作.</p>
 <p>等待官方审核.</p>
 <p>等待下发解锁权限.</p>
-<p>下发解锁权限后，就可以进行下面的解锁操作咯.</p>
+<p>下发解锁权限后，申请APP将相关信息写入系统，即可进行下面的解锁操作.</p>
 <h3 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h3><p>设置，其他设置，备份与恢复，将重要的数据进行备份，然后将内置存储 Backup 目录拷贝到电脑.<br>同时可以将非常重要的数据如联系人通话记录短信等进行云备份.<br>解锁 BootLoader 后进行自己需要的玩机操作后可自行恢复数据.</p>
 <h3 id="解锁"><a href="#解锁" class="headerlink" title="解锁"></a>解锁</h3><h4 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h4><p>设置，关于手机，连续点击版本号，提示已打开开发者选项.</p>
 <p>设置，其他设置，开发者选项，打开 OEM 解锁和 USB 调试.</p>
-<h4 id="adb-amp-fastboot-命令"><a href="#adb-amp-fastboot-命令" class="headerlink" title="adb &amp; fastboot 命令"></a>adb &amp; fastboot 命令</h4><p>重启进入 Fastboot 模式.</p>
+<h4 id="adb-amp-fastboot-命令"><a href="#adb-amp-fastboot-命令" class="headerlink" title="adb &amp; fastboot 命令"></a>adb &amp; fastboot 命令</h4><p>下载 <a href="https://developer.android.google.cn/studio/releases/platform-tools" target="_blank" rel="noopener">Android Sdk Platform-Tools</a>，我们将要使用其中的 adb &amp; fastboot 命令 <a href="https://dl.google.com/android/repository/platform-tools-latest-windows.zip" target="_blank" rel="noopener">windows</a> <a href="https://dl.google.com/android/repository/platform-tools-latest-linux.zip" target="_blank" rel="noopener">linux</a> <a href="https://dl.google.com/android/repository/platform-tools-latest-darwin.zip" target="_blank" rel="noopener">mac</a>.</p>
+<p>重启进入 Fastboot 模式.</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb reboot bootloader</span><br></pre></td></tr></table></figure>
 <p>看到 DEVICE STATE ：locked，说明此时 BootLoader 处于锁定状态.</p>
 <p><img src="/2018/11/08/oppo-r17pro-root/r17pro-bootloader-locked.jpg" alt="R17 Pro BootLoader locked"></p>
@@ -571,8 +572,17 @@
 <p>将 <a href="https://pan.baidu.com/s/1R-7ProYUWoA8dVFQohjpOQ#list/path=%2Fandroid%2F%E7%AC%AC%E4%B8%89%E6%96%B9ROM%2FOPPO%20R17%2Frecovery-R17Pro%2Ftwrp%20recovery&amp;page=1" target="_blank" rel="noopener">twrp.img</a> 刷入 recovery 分区.</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fastboot flash recovery twrp.img</span><br></pre></td></tr></table></figure>
 <p>音量键选择 recovery mode，按电源键确认，进入 TWRP .<br><img src="/2018/11/08/oppo-r17pro-root/r17pro-twrp-mode.jpg" alt="R17 Pro TWRP mode"></p>
-<h4 id="刷入-SuperSU"><a href="#刷入-SuperSU" class="headerlink" title="刷入 SuperSU"></a>刷入 SuperSU</h4><p>将网盘中的 SuperSU 补丁放入内置存储空间，使用 TWRP recovery 刷入即可实现 root .</p>
+<h4 id="TWRP相关操作"><a href="#TWRP相关操作" class="headerlink" title="TWRP相关操作"></a>TWRP相关操作</h4><p>首次进入提示是否允许修改 system,vendor，根据自己的需要进行选择.（主页-&gt;挂载-&gt;挂载系统分区只读）</p>
 <p><img src="/2018/11/08/oppo-r17pro-root/r17pro-twrp-recovery.jpg" alt="R17 Pro TWRP mode"></p>
+<p>双清：主页-&gt;清除-&gt;滑动恢复出厂设置（此项操作会清除你的 data 分区除内置存储外的文件）.</p>
+<p>格式化 Data：主页-&gt;清除-&gt;格式化 Data -&gt;输入 yes （此项操作会清除你的 data 分区全部文件，含内置存储.</p>
+<p>卡刷：主页-&gt;安装-&gt;浏览到自己需要的卡刷包，点击，滑动刷入.</p>
+<p>备份：主页-&gt;备份-&gt;选择自己需要备份的分区-&gt;滑动备份.</p>
+<p>还原：主页-&gt;还原-&gt;选择需要还原的版本-&gt;选择需要还原的分区-&gt;滑动还原.</p>
+<p>高级：主页-&gt;高级-&gt;文件管理;主页-&gt;高级-&gt;终端命令行.</p>
+<p>ColorOS 升级 &amp; root &amp; … ：将 ColorOS 完整卡刷包和 root 等要刷的补丁放入内置存储，直接卡刷即可，先刷 ColorOS 完整卡刷包，后刷补丁.</p>
+<p>双清刷 ROM &amp; root &amp; … ：将 ColorOS 完整卡刷包和 root 等要刷的补丁放入内置存储，双清后直接卡刷即可，先刷 ColorOS 完整卡刷包，后刷补丁.</p>
+<h4 id="玩机-1"><a href="#玩机-1" class="headerlink" title="玩机"></a>玩机</h4><p>将网盘中的 SuperSU 补丁放入内置存储，使用 TWRP recovery 刷入即可实现 root .</p>
 <p>其他补丁也可使用相同方法刷入，实现 xposed 等玩机功能.</p>
 
       
@@ -848,7 +858,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#开篇三问"><span class="nav-number">1.</span> <span class="nav-text">开篇三问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重要的事情说三遍"><span class="nav-number">2.</span> <span class="nav-text">重要的事情说三遍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#申请"><span class="nav-number">3.</span> <span class="nav-text">申请</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#OPPO-帐号"><span class="nav-number">3.1.</span> <span class="nav-text">OPPO 帐号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#下载申请-APP"><span class="nav-number">3.2.</span> <span class="nav-text">下载申请 APP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#申请-1"><span class="nav-number">3.3.</span> <span class="nav-text">申请</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#备份"><span class="nav-number">4.</span> <span class="nav-text">备份</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解锁"><span class="nav-number">5.</span> <span class="nav-text">解锁</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#设置"><span class="nav-number">5.1.</span> <span class="nav-text">设置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#adb-amp-fastboot-命令"><span class="nav-number">5.2.</span> <span class="nav-text">adb &amp; fastboot 命令</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#玩机"><span class="nav-number">6.</span> <span class="nav-text">玩机</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#刷入-TWRP"><span class="nav-number">6.1.</span> <span class="nav-text">刷入 TWRP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#刷入-SuperSU"><span class="nav-number">6.2.</span> <span class="nav-text">刷入 SuperSU</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#开篇三问"><span class="nav-number">1.</span> <span class="nav-text">开篇三问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重要的事情说三遍"><span class="nav-number">2.</span> <span class="nav-text">重要的事情说三遍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#申请"><span class="nav-number">3.</span> <span class="nav-text">申请</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#OPPO-帐号"><span class="nav-number">3.1.</span> <span class="nav-text">OPPO 帐号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#下载申请-APP"><span class="nav-number">3.2.</span> <span class="nav-text">下载申请 APP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#申请-1"><span class="nav-number">3.3.</span> <span class="nav-text">申请</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#备份"><span class="nav-number">4.</span> <span class="nav-text">备份</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解锁"><span class="nav-number">5.</span> <span class="nav-text">解锁</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#设置"><span class="nav-number">5.1.</span> <span class="nav-text">设置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#adb-amp-fastboot-命令"><span class="nav-number">5.2.</span> <span class="nav-text">adb &amp; fastboot 命令</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#玩机"><span class="nav-number">6.</span> <span class="nav-text">玩机</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#刷入-TWRP"><span class="nav-number">6.1.</span> <span class="nav-text">刷入 TWRP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TWRP相关操作"><span class="nav-number">6.2.</span> <span class="nav-text">TWRP相关操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#玩机-1"><span class="nav-number">6.3.</span> <span class="nav-text">玩机</span></a></li></ol></li></ol></div>
             
 
           </div>
