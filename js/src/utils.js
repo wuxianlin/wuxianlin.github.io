@@ -7,7 +7,7 @@ NexT.utils = NexT.$u = {
    */
   wrapImageWithFancyBox: function() {
     $('.content img')
-      .not('[hidden]')
+      .not(':hidden')
       .not('.group-picture img, .post-gallery img')
       .each(function() {
         var $image = $(this);
@@ -79,7 +79,6 @@ NexT.utils = NexT.$u = {
         }
       }
     });
-
   },
 
   registerESCKeyEvent: function() {
@@ -119,7 +118,7 @@ NexT.utils = NexT.$u = {
     });
 
     $top.on('click', function() {
-      $('body').velocity('scroll');
+      $.isFunction($('html').velocity) ? $('body').velocity('scroll') : $('html, body').animate({ scrollTop: 0 });
     });
   },
 
@@ -240,6 +239,10 @@ NexT.utils = NexT.$u = {
     $('.sidebar-toggle').trigger('click');
   },
 
+  isMuse: function() {
+    return CONFIG.scheme === 'Muse';
+  },
+
   isMist: function() {
     return CONFIG.scheme === 'Mist';
   },
@@ -256,7 +259,6 @@ NexT.utils = NexT.$u = {
     var $div = $('<div />').addClass('scrollbar-measure').prependTo('body');
     var div = $div[0];
     var scrollbarWidth = div.offsetWidth - div.clientWidth;
-
     $div.remove();
 
     return scrollbarWidth;
@@ -285,7 +287,6 @@ NexT.utils = NexT.$u = {
       : (sidebarPadding * 2) + (sidebarNavHeight / 2);
     return sidebarSchemePadding;
   }
-
 };
 
 $(document).ready(function() {
@@ -325,7 +326,5 @@ $(document).ready(function() {
     // Initialize Sidebar & TOC Height.
     updateSidebarHeight(document.body.clientHeight - NexT.utils.getSidebarSchemePadding());
   }
-
   initSidebarDimension();
-
 });
