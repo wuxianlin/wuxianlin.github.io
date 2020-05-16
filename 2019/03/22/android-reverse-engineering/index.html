@@ -104,7 +104,7 @@
 <meta property="og:site_name" content="wuxianlin">
 <meta property="og:description" content="当你拿到Android手机的卡刷包/线刷包，你有没有想过解开它？当你眼前摆着一个APK/jar/so，你有没有想过反编译/反汇编/动态调试然后分析研究它？……">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-06-05T16:23:22.745Z">
+<meta property="og:updated_time" content="2020-05-16T13:11:46.598Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android 逆向相关">
 <meta name="twitter:description" content="当你拿到Android手机的卡刷包/线刷包，你有没有想过解开它？当你眼前摆着一个APK/jar/so，你有没有想过反编译/反汇编/动态调试然后分析研究它？……">
@@ -463,7 +463,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-06-06 00:23:22" itemprop="dateModified" datetime="2019-06-06T00:23:22+08:00">2019-06-06</time>
+                <time title="修改时间：2020-05-16 21:11:46" itemprop="dateModified" datetime="2020-05-16T21:11:46+08:00">2020-05-16</time>
               
             
           </span>
@@ -525,10 +525,11 @@
         <p>当你拿到Android手机的卡刷包/线刷包，你有没有想过解开它？当你眼前摆着一个APK/jar/so，你有没有想过反编译/反汇编/动态调试然后分析研究它？……</p>
 <a id="more"></a>
 <h3 id="刷机包"><a href="#刷机包" class="headerlink" title="刷机包"></a>刷机包</h3><h4 id="sparse-img-gt-ext4-img"><a href="#sparse-img-gt-ext4-img" class="headerlink" title="sparse img -&gt; ext4 img"></a>sparse img -&gt; ext4 img</h4><p>线刷包里面找到system.img/vendor.img<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ file system.img</span><br><span class="line">system.img: Android sparse image, version: 1.0, Total of 849920 4096-byte output blocks in 2454 input chunks.</span><br></pre></td></tr></table></figure></p>
-<p>使用Android源码编译得到out/host/linux-x86/bin/simg2img即可将Android的sparse image转为ext4的image</p>
-<h4 id="dat-gt-ext4-img"><a href="#dat-gt-ext4-img" class="headerlink" title="dat -&gt; ext4 img"></a>dat -&gt; ext4 img</h4><p>system.new.dat.br转system.new.dat<br>brotli –decompress system.new.dat.br –output=system.new.dat</p>
-<p>system.new.dat system.patch.dat system.transfer.list转ext4 img<br><a href="https://github.com/xpirt/sdat2img" target="_blank" rel="noopener">https://github.com/xpirt/sdat2img</a></p>
-<h4 id="payload-dump"><a href="#payload-dump" class="headerlink" title="payload dump"></a>payload dump</h4><p><a href="https://gist.github.com/ius/42bd02a5df2226633a342ab7a9c60f15" target="_blank" rel="noopener">https://gist.github.com/ius/42bd02a5df2226633a342ab7a9c60f15</a></p>
+<p>使用Android源码编译make simg2img得到out/host/linux-x86/bin/simg2img即可将Android的sparse image转为ext4的image</p>
+<h4 id="super-img-gt-super-ext4-img-gt-system-product-vendor-ext4-img"><a href="#super-img-gt-super-ext4-img-gt-system-product-vendor-ext4-img" class="headerlink" title="super img -&gt; super ext4 img -&gt; system product vendor ext4 img"></a>super img -&gt; super ext4 img -&gt; system product vendor ext4 img</h4><p>预装Android 10的机型一般使用<a href="https://source.android.google.cn/devices/tech/ota/dynamic_partitions" target="_blank" rel="noopener">动态分区</a><br>线刷包里面找到super.img<br>使用simg2img将super.img转为super_ext4.img<br>使用Android源码编译make lpunpack得到out/host/linux-x86/bin/lpunpack super_ext4.img super</p>
+<h4 id="dat-gt-ext4-img"><a href="#dat-gt-ext4-img" class="headerlink" title="dat -&gt; ext4 img"></a>dat -&gt; ext4 img</h4><p>卡刷包中的system.new.dat.br转system.new.dat<br>brotli –decompress system.new.dat.br –output=system.new.dat</p>
+<p>卡刷包中的system.new.dat system.patch.dat system.transfer.list转ext4 img<br><a href="https://github.com/xpirt/sdat2img" target="_blank" rel="noopener">https://github.com/xpirt/sdat2img</a></p>
+<h4 id="payload-dump"><a href="#payload-dump" class="headerlink" title="payload dump"></a>payload dump</h4><p>AB分区卡刷包相关<br><a href="https://gist.github.com/ius/42bd02a5df2226633a342ab7a9c60f15" target="_blank" rel="noopener">https://gist.github.com/ius/42bd02a5df2226633a342ab7a9c60f15</a></p>
 <h3 id="odex-oat-vdex"><a href="#odex-oat-vdex" class="headerlink" title="odex/oat/vdex"></a>odex/oat/vdex</h3><p>Android &lt;=4.4 odex to dex</p>
 <p><a href="https://github.com/JesusFreke/smali/wiki/DeodexInstructions" target="_blank" rel="noopener">https://github.com/JesusFreke/smali/wiki/DeodexInstructions</a><br><a href="https://bitbucket.org/JesusFreke/smali/downloads/" target="_blank" rel="noopener">https://bitbucket.org/JesusFreke/smali/downloads/</a></p>
 <p>Android &lt;=7 oat to dex</p>
@@ -821,7 +822,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#刷机包"><span class="nav-number">1.</span> <span class="nav-text">刷机包</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sparse-img-gt-ext4-img"><span class="nav-number">1.1.</span> <span class="nav-text">sparse img -&gt; ext4 img</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dat-gt-ext4-img"><span class="nav-number">1.2.</span> <span class="nav-text">dat -&gt; ext4 img</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#payload-dump"><span class="nav-number">1.3.</span> <span class="nav-text">payload dump</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#odex-oat-vdex"><span class="nav-number">2.</span> <span class="nav-text">odex/oat/vdex</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dex"><span class="nav-number">3.</span> <span class="nav-text">dex</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#dex转smali"><span class="nav-number">3.1.</span> <span class="nav-text">dex转smali</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dex转jar-java"><span class="nav-number">3.2.</span> <span class="nav-text">dex转jar/java</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#刷机包"><span class="nav-number">1.</span> <span class="nav-text">刷机包</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sparse-img-gt-ext4-img"><span class="nav-number">1.1.</span> <span class="nav-text">sparse img -&gt; ext4 img</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#super-img-gt-super-ext4-img-gt-system-product-vendor-ext4-img"><span class="nav-number">1.2.</span> <span class="nav-text">super img -&gt; super ext4 img -&gt; system product vendor ext4 img</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dat-gt-ext4-img"><span class="nav-number">1.3.</span> <span class="nav-text">dat -&gt; ext4 img</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#payload-dump"><span class="nav-number">1.4.</span> <span class="nav-text">payload dump</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#odex-oat-vdex"><span class="nav-number">2.</span> <span class="nav-text">odex/oat/vdex</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dex"><span class="nav-number">3.</span> <span class="nav-text">dex</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#dex转smali"><span class="nav-number">3.1.</span> <span class="nav-text">dex转smali</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dex转jar-java"><span class="nav-number">3.2.</span> <span class="nav-text">dex转jar/java</span></a></li></ol></li></ol></div>
             
 
           </div>
