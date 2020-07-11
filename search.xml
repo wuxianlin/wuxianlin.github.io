@@ -1,9 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title><![CDATA[Android 逆向相关]]></title>
-    <url>%2F2019%2F03%2F22%2Fandroid-reverse-engineering%2F</url>
-    <content type="text"><![CDATA[当你拿到Android手机的卡刷包/线刷包，你有没有想过解开它？当你眼前摆着一个APK/jar/so，你有没有想过反编译/反汇编/动态调试然后分析研究它？…… 刷机包sparse img -&gt; ext4 img线刷包里面找到system.img/vendor.img12$ file system.imgsystem.img: Android sparse image, version: 1.0, Total of 849920 4096-byte output blocks in 2454 input chunks. 使用Android源码编译make simg2img得到out/host/linux-x86/bin/simg2img即可将Android的sparse image转为ext4的image super img -&gt; super ext4 img -&gt; system product vendor ext4 img预装Android 10的机型一般使用动态分区线刷包里面找到super.img使用simg2img将super.img转为super_ext4.img使用Android源码编译make lpunpack得到out/host/linux-x86/bin/lpunpack super_ext4.img super dat -&gt; ext4 img卡刷包中的system.new.dat.br转system.new.datbrotli –decompress system.new.dat.br –output=system.new.dat 卡刷包中的system.new.dat system.patch.dat system.transfer.list转ext4 imghttps://github.com/xpirt/sdat2img payload dumpAB分区卡刷包相关https://gist.github.com/ius/42bd02a5df2226633a342ab7a9c60f15 odex/oat/vdexAndroid &lt;=4.4 odex to dex https://github.com/JesusFreke/smali/wiki/DeodexInstructionshttps://bitbucket.org/JesusFreke/smali/downloads/ Android &lt;=7 oat to dex https://github.com/testwhat/SmaliEx/releaseshttps://github.com/testwhat/SmaliExhttps://github.com/JesusFreke/smali/wiki/DeodexInstructionshttps://bitbucket.org/JesusFreke/smali/downloads/ Android 8 vdex to dex https://github.com/anestisb/vdexExtractor Android 9 vdex-&gt;cdex-&gt;dex https://github.com/anestisb/vdexExtractorhttps://github.com/anestisb/vdexExtractor/issues/23tools/deodex/run.sh -h dexdex转smaliapktool工具 针对 apk包括dex和资源 https://github.com/iBotPeaches/Apktoolhttps://ibotpeaches.github.io/Apktool/ baksmali、smali 针对dex https://github.com/JesusFreke/smalihttps://bitbucket.org/JesusFreke/smali/downloads/ dex转jar/javagooge enjarify工具dex转jar https://github.com/google/enjarify dex2jar https://github.com/pxb1988/dex2jarhttps://github.com/pxb1988/dex2jar/releases 结合jd-gui https://github.com/java-decompiler/jd-guihttp://jd.benow.ca/ 二合一工具https://github.com/skylot/jadx]]></content>
+    <title>Android 逆向相关</title>
+    <url>/2019/03/22/android-reverse-engineering/</url>
+    <content><![CDATA[<p>当你拿到Android手机的卡刷包/线刷包，你有没有想过解开它？当你眼前摆着一个APK/jar/so，你有没有想过反编译/反汇编/动态调试然后分析研究它？……</p>
+<a id="more"></a>
+
+<h3 id="刷机包"><a href="#刷机包" class="headerlink" title="刷机包"></a>刷机包</h3><h4 id="sparse-img-gt-ext4-img"><a href="#sparse-img-gt-ext4-img" class="headerlink" title="sparse img -&gt; ext4 img"></a>sparse img -&gt; ext4 img</h4><p>线刷包里面找到system.img/vendor.img</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ file system.img</span><br><span class="line">system.img: Android sparse image, version: 1.0, Total of 849920 4096-byte output blocks in 2454 input chunks.</span><br></pre></td></tr></table></figure>
+<p>使用Android源码编译make simg2img得到out/host/linux-x86/bin/simg2img即可将Android的sparse image转为ext4的image</p>
+<h4 id="super-img-gt-super-ext4-img-gt-system-product-vendor-ext4-img"><a href="#super-img-gt-super-ext4-img-gt-system-product-vendor-ext4-img" class="headerlink" title="super img -&gt; super ext4 img -&gt; system product vendor ext4 img"></a>super img -&gt; super ext4 img -&gt; system product vendor ext4 img</h4><p>预装Android 10的机型一般使用<a href="https://source.android.google.cn/devices/tech/ota/dynamic_partitions" target="_blank" rel="noopener">动态分区</a><br>线刷包里面找到super.img<br>使用simg2img将super.img转为super_ext4.img<br>使用Android源码编译make lpunpack得到out/host/linux-x86/bin/lpunpack super_ext4.img super</p>
+<h4 id="dat-gt-ext4-img"><a href="#dat-gt-ext4-img" class="headerlink" title="dat -&gt; ext4 img"></a>dat -&gt; ext4 img</h4><p>卡刷包中的system.new.dat.br转system.new.dat<br>brotli –decompress system.new.dat.br –output=system.new.dat</p>
+<p>卡刷包中的system.new.dat system.patch.dat system.transfer.list转ext4 img<br><a href="https://github.com/xpirt/sdat2img" target="_blank" rel="noopener">https://github.com/xpirt/sdat2img</a></p>
+<h4 id="payload-dump"><a href="#payload-dump" class="headerlink" title="payload dump"></a>payload dump</h4><p>AB分区卡刷包相关<br><a href="https://github.com/cyxx/extract_android_ota_payload" target="_blank" rel="noopener">https://github.com/cyxx/extract_android_ota_payload</a></p>
+<h3 id="odex-oat-vdex"><a href="#odex-oat-vdex" class="headerlink" title="odex/oat/vdex"></a>odex/oat/vdex</h3><p>Android &lt;=4.4 odex to dex</p>
+<p><a href="https://github.com/JesusFreke/smali/wiki/DeodexInstructions" target="_blank" rel="noopener">https://github.com/JesusFreke/smali/wiki/DeodexInstructions</a><br><a href="https://bitbucket.org/JesusFreke/smali/downloads/" target="_blank" rel="noopener">https://bitbucket.org/JesusFreke/smali/downloads/</a></p>
+<p>Android &lt;=7 oat to dex</p>
+<p><a href="https://github.com/testwhat/SmaliEx/releases" target="_blank" rel="noopener">https://github.com/testwhat/SmaliEx/releases</a><br><a href="https://github.com/testwhat/SmaliEx" target="_blank" rel="noopener">https://github.com/testwhat/SmaliEx</a><br><a href="https://github.com/JesusFreke/smali/wiki/DeodexInstructions" target="_blank" rel="noopener">https://github.com/JesusFreke/smali/wiki/DeodexInstructions</a><br><a href="https://bitbucket.org/JesusFreke/smali/downloads/" target="_blank" rel="noopener">https://bitbucket.org/JesusFreke/smali/downloads/</a></p>
+<p>Android 8 vdex to dex</p>
+<p><a href="https://github.com/anestisb/vdexExtractor" target="_blank" rel="noopener">https://github.com/anestisb/vdexExtractor</a></p>
+<p>Android 9 vdex-&gt;cdex-&gt;dex</p>
+<p><a href="https://github.com/anestisb/vdexExtractor" target="_blank" rel="noopener">https://github.com/anestisb/vdexExtractor</a><br><a href="https://github.com/anestisb/vdexExtractor/issues/23" target="_blank" rel="noopener">https://github.com/anestisb/vdexExtractor/issues/23</a><br>tools/deodex/run.sh -h</p>
+<h3 id="dex"><a href="#dex" class="headerlink" title="dex"></a>dex</h3><h4 id="dex转smali"><a href="#dex转smali" class="headerlink" title="dex转smali"></a>dex转smali</h4><p>apktool工具 针对 apk包括dex和资源</p>
+<p><a href="https://github.com/iBotPeaches/Apktool" target="_blank" rel="noopener">https://github.com/iBotPeaches/Apktool</a><br><a href="https://ibotpeaches.github.io/Apktool/" target="_blank" rel="noopener">https://ibotpeaches.github.io/Apktool/</a></p>
+<p>baksmali、smali 针对dex</p>
+<p><a href="https://github.com/JesusFreke/smali" target="_blank" rel="noopener">https://github.com/JesusFreke/smali</a><br><a href="https://bitbucket.org/JesusFreke/smali/downloads/" target="_blank" rel="noopener">https://bitbucket.org/JesusFreke/smali/downloads/</a></p>
+<h4 id="dex转jar-java"><a href="#dex转jar-java" class="headerlink" title="dex转jar/java"></a>dex转jar/java</h4><p>googe enjarify工具dex转jar</p>
+<p><a href="https://github.com/google/enjarify" target="_blank" rel="noopener">https://github.com/google/enjarify</a></p>
+<p>dex2jar</p>
+<p><a href="https://github.com/pxb1988/dex2jar" target="_blank" rel="noopener">https://github.com/pxb1988/dex2jar</a><br><a href="https://github.com/pxb1988/dex2jar/releases" target="_blank" rel="noopener">https://github.com/pxb1988/dex2jar/releases</a></p>
+<p>结合jd-gui</p>
+<p><a href="https://github.com/java-decompiler/jd-gui" target="_blank" rel="noopener">https://github.com/java-decompiler/jd-gui</a><br><a href="http://jd.benow.ca/" target="_blank" rel="noopener">http://jd.benow.ca/</a></p>
+<p>二合一工具<br><a href="https://github.com/skylot/jadx" target="_blank" rel="noopener">https://github.com/skylot/jadx</a> </p>
+]]></content>
       <categories>
         <category>android</category>
       </categories>
@@ -13,23 +42,80 @@
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[OPPO R17 Pro 解锁 BootLoader & root]]></title>
-    <url>%2F2018%2F11%2F08%2Foppo-r17pro-root%2F</url>
-    <content type="text"><![CDATA[OPPO 已经开放 R17 Pro 申请解锁 BootLoader ，需要玩机的你准备好了吗？ 开篇三问你知道什么是解锁 BootLoader，什么是 root 权限吗？如果不知道，那建议你不要解锁 BootLoader，更不要 root. 你会使用 adb 和 fastboot 吗？你会使用 TWRP 吗？你会双清、卡刷等刷机操作吗？如果不会，那建议你不要解锁 BootLoader，更不要 root. 你解锁 Bootloader &amp; root 后要做什么？如果你连要做什么都不知道，奉劝你不要抱着好奇的心态进行尝试. 重要的事情说三遍玩机有风险，刷机需谨慎. 仔细阅读官方网站注意事项. 手机不开机、数据丢失等严重后果请自负，官方售后可帮你刷回官方固件. 申请OPPO 帐号如果你没有 OPPO 账号，那马上注册一个吧,https://id.oppo.com. 下载申请 APP从R17 Pro 申请解锁 BootLoader 官方网站下载解锁申请 APP.安装到手机. 申请打开申请 APP，按照提示进行操作. 等待官方审核. 等待下发解锁权限. 下发解锁权限后，申请APP将相关信息写入系统，即可进行下面的解锁操作. 备份设置，其他设置，备份与恢复，将重要的数据进行备份，然后将内置存储 Backup 目录拷贝到电脑.同时可以将非常重要的数据如联系人通话记录短信等进行云备份.解锁 BootLoader 后进行自己需要的玩机操作后可自行恢复数据. 解锁设置设置，关于手机，连续点击版本号，提示已打开开发者选项. 设置，其他设置，开发者选项，打开 OEM 解锁和 USB 调试. adb &amp; fastboot 命令下载 Android Sdk Platform-Tools，我们将要使用其中的 adb &amp; fastboot 命令 windows linux mac. 重启进入 Fastboot 模式. 1adb reboot bootloader 看到 DEVICE STATE ：locked，说明此时 BootLoader 处于锁定状态. 开始解锁咯！1fastboot flashing unlock 或者 1fastboot flashing unlock_critical 询问是否解锁，确认解锁就使用音量键选择 UNLOCK THE BOOTLOADER，否则选择 DO NOT UNLOCK THE BOOTLOADER (此时后悔还来得及)，电源键确认. 手机会重启进入 recovery 模式格式化 data 分区，然后自动开机. 1adb reboot bootloader 再次进入 Fastboot 模式，可看到 DEVICE STATE ：unlocked，说明此时 BootLoader 处于解锁状态，此时你就可以使用 fastboot flash [分区名] [文件路径]为所欲为了. 玩机刷入 TWRP在 FastBoot 模式. 将 twrp.img 刷入 recovery 分区. 1fastboot flash recovery twrp.img 音量键选择 recovery mode，按电源键确认，进入 TWRP . TWRP相关操作首次进入提示是否允许修改 system,vendor，根据自己的需要进行选择.（主页-&gt;挂载-&gt;挂载系统分区只读） 双清：主页-&gt;清除-&gt;滑动恢复出厂设置（此项操作会清除你的 data 分区除内置存储外的文件）. 格式化 Data：主页-&gt;清除-&gt;格式化 Data -&gt;输入 yes （此项操作会清除你的 data 分区全部文件，含内置存储. 卡刷：主页-&gt;安装-&gt;浏览到自己需要的卡刷包，点击，滑动刷入. 备份：主页-&gt;备份-&gt;选择自己需要备份的分区-&gt;滑动备份. 还原：主页-&gt;还原-&gt;选择需要还原的版本-&gt;选择需要还原的分区-&gt;滑动还原. 高级：主页-&gt;高级-&gt;文件管理;主页-&gt;高级-&gt;终端命令行. ColorOS 升级 &amp; root &amp; … ：将 ColorOS 完整卡刷包和 root 等要刷的补丁放入内置存储，直接卡刷即可，先刷 ColorOS 完整卡刷包，后刷补丁. 双清刷 ROM &amp; root &amp; … ：将 ColorOS 完整卡刷包和 root 等要刷的补丁放入内置存储，双清后直接卡刷即可，先刷 ColorOS 完整卡刷包，后刷补丁. 玩机将网盘中的 SuperSU 补丁放入内置存储，使用 TWRP recovery 刷入即可实现 root . 其他补丁也可使用相同方法刷入，实现 xposed 等玩机功能.]]></content>
+    <title>本站介绍</title>
+    <url>/2018/08/08/hello-world/</url>
+    <content><![CDATA[<p>本站为 wuxianlin 个人网站，有意见欢迎来提，有问题欢迎来问，更欢迎志同道合的朋友一起交流.</p>
+<a id="more"></a>
+
+<h2 id="你知道吗"><a href="#你知道吗" class="headerlink" title="你知道吗"></a>你知道吗</h2><h3 id="资源转移"><a href="#资源转移" class="headerlink" title="资源转移"></a>资源转移</h3><p>你以前来这里查找玩机资源，现在转移到<a href="/android">玩机页面</a>了.</p>
+<h3 id="百度云"><a href="#百度云" class="headerlink" title="百度云"></a>百度云</h3><p>你以前通过<a href="http://dwz.cn/wudashen" target="_blank" rel="noopener">百度云共享</a>关注最新玩机资源，现在需要关注百度云后在 APP 端查看动态.</p>
+<h2 id="聊一聊"><a href="#聊一聊" class="headerlink" title="聊一聊"></a>聊一聊</h2><h3 id="我"><a href="#我" class="headerlink" title="我"></a>我</h3><p>玩手机玩平板，玩电视广播机顶盒，玩卫星有线无线，玩视频音乐，，，<br>刷微博不刷朋友圈，玩小游戏不玩大游戏，打小球不打大球，会写代码不会写作文，会数学物理不会语文英语，看电视剧不看小说，，，<br>关注 科技，，， 关注 Android 尤其是 root ，，，关注 OPPO(OnePlus/Realme) ，，，</p>
+<h3 id="联系"><a href="#联系" class="headerlink" title="联系"></a>联系</h3><p><a href="https://weibo.com/wuxianlin000000" target="_blank" rel="noopener">wuxianlin Weibo</a><br><a href="https://github.com/wuxianlin" target="_blank" rel="noopener">wuxianlin GitHub</a></p>
+]]></content>
       <categories>
-        <category>root</category>
+        <category>闲聊</category>
       </categories>
       <tags>
-        <tag>OPPO</tag>
-        <tag>root</tag>
-        <tag>BootLoader</tag>
-        <tag>R17Pro</tag>
+        <tag>闲聊</tag>
+        <tag>介绍</tag>
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[OPPO Find X 解锁 BootLoader & root]]></title>
-    <url>%2F2018%2F09%2F22%2Foppo-findx-root%2F</url>
-    <content type="text"><![CDATA[OPPO 已经开放 Find X 申请解锁 BootLoader ，需要玩机的你准备好了吗？ 开篇三问你知道什么是解锁 BootLoader，什么是 root 权限吗？如果不知道，那建议你不要解锁 BootLoader，更不要 root. 你会使用 adb 和 fastboot 吗？你会使用 TWRP 吗？你会双清、卡刷等刷机操作吗？如果不会，那建议你不要解锁 BootLoader，更不要 root. 你解锁 Bootloader &amp; root 后要做什么？如果你连要做什么都不知道，奉劝你不要抱着好奇的心态进行尝试. 重要的事情说三遍玩机有风险，刷机需谨慎. 仔细阅读官方网站注意事项. 手机不开机、数据丢失等严重后果请自负，官方售后可帮你刷回官方固件. 申请OPPO 帐号如果你没有 OPPO 账号，那马上注册一个吧,https://id.oppo.com. 下载申请 APP从Find X 申请解锁 BootLoader 官方网站下载解锁申请 APP.安装到手机. 申请打开申请 APP，按照提示进行操作. 等待官方审核. 等待下发解锁权限. 下发解锁权限后，申请APP将相关信息写入系统，即可进行下面的解锁操作. 备份设置，其他设置，备份与恢复，将重要的数据进行备份，然后将内置存储 Backup 目录拷贝到电脑.同时可以将非常重要的数据如联系人通话记录短信等进行云备份.解锁 BootLoader 后进行自己需要的玩机操作后可自行恢复数据. 解锁设置设置，关于手机，连续点击版本号，提示已打开开发者选项. 设置，其他设置，开发者选项，打开 OEM 解锁和 USB 调试. adb &amp; fastboot 命令下载 Android Sdk Platform-Tools，我们将要使用其中的 adb &amp; fastboot 命令 windows linux mac. 重启进入 Fastboot 模式. 1adb reboot bootloader 看到 DEVICE STATE ：locked，说明此时 BootLoader 处于锁定状态. 开始解锁咯！1fastboot flashing unlock 或者 1fastboot flashing unlock_critical 询问是否解锁，确认解锁就使用音量键选择 UNLOCK THE BOOTLOADER，否则选择 DO NOT UNLOCK THE BOOTLOADER (此时后悔还来得及)，电源键确认. 手机会重启进入 recovery 模式格式化 data 分区，然后自动开机. 1adb reboot bootloader 再次进入 Fastboot 模式，可看到 DEVICE STATE ：unlocked，说明此时 BootLoader 处于解锁状态，此时你就可以使用 fastboot flash [分区名] [文件路径]为所欲为了. 玩机刷入 TWRP在 FastBoot 模式. 将 twrp.img 刷入 recovery 分区. 1fastboot flash recovery twrp.img 音量键选择 recovery mode，按电源键确认，进入 TWRP . TWRP相关操作首次进入提示是否允许修改 system,vendor，根据自己的需要进行选择.（主页-&gt;挂载-&gt;挂载系统分区只读） 双清：主页-&gt;清除-&gt;滑动恢复出厂设置（此项操作会清除你的 data 分区除内置存储外的文件）. 格式化 Data：主页-&gt;清除-&gt;格式化 Data -&gt;输入 yes （此项操作会清除你的 data 分区全部文件，含内置存储. 卡刷：主页-&gt;安装-&gt;浏览到自己需要的卡刷包，点击，滑动刷入. 备份：主页-&gt;备份-&gt;选择自己需要备份的分区-&gt;滑动备份. 还原：主页-&gt;还原-&gt;选择需要还原的版本-&gt;选择需要还原的分区-&gt;滑动还原. 高级：主页-&gt;高级-&gt;文件管理;主页-&gt;高级-&gt;终端命令行. ColorOS 升级 &amp; root &amp; … ：将 ColorOS 完整卡刷包和 root 等要刷的补丁放入内置存储，直接卡刷即可，先刷 ColorOS 完整卡刷包，后刷补丁. 双清刷 ROM &amp; root &amp; … ：将 ColorOS 完整卡刷包和 root 等要刷的补丁放入内置存储，双清后直接卡刷即可，先刷 ColorOS 完整卡刷包，后刷补丁. 玩机将网盘中的 SuperSU 补丁放入内置存储，使用 TWRP recovery 刷入即可实现 root . 其他补丁也可使用相同方法刷入，实现 xposed 等玩机功能.]]></content>
+    <title>OPPO Find X 解锁 BootLoader &amp; root</title>
+    <url>/2018/09/22/oppo-findx-root/</url>
+    <content><![CDATA[<p>OPPO 已经开放 Find X 申请解锁 BootLoader ，需要玩机的你准备好了吗？</p>
+<a id="more"></a>
+
+<h3 id="开篇三问"><a href="#开篇三问" class="headerlink" title="开篇三问"></a>开篇三问</h3><p>你知道什么是解锁 BootLoader，什么是 root 权限吗？<br>如果不知道，那建议你不要解锁 BootLoader，更不要 root.</p>
+<p>你会使用 adb 和 fastboot 吗？你会使用 TWRP 吗？你会双清、卡刷等刷机操作吗？<br>如果不会，那建议你不要解锁 BootLoader，更不要 root.</p>
+<p>你解锁 Bootloader &amp; root 后要做什么？<br>如果你连要做什么都不知道，奉劝你不要抱着好奇的心态进行尝试.</p>
+<h3 id="重要的事情说三遍"><a href="#重要的事情说三遍" class="headerlink" title="重要的事情说三遍"></a>重要的事情说三遍</h3><p>玩机有风险，刷机需谨慎.</p>
+<p>仔细阅读官方网站<a href="https://bbs.coloros.com/thread-1498611-1-1.html" target="_blank" rel="noopener">注意事项</a>.</p>
+<p>手机不开机、数据丢失等严重后果请自负，<a href="http://www.oppo.com/cn/service/map" target="_blank" rel="noopener">官方售后</a>可帮你刷回官方固件.</p>
+<h3 id="申请"><a href="#申请" class="headerlink" title="申请"></a>申请</h3><h4 id="OPPO-帐号"><a href="#OPPO-帐号" class="headerlink" title="OPPO 帐号"></a>OPPO 帐号</h4><p>如果你没有 OPPO 账号，那马上注册一个吧,<a href="https://id.oppo.com" target="_blank" rel="noopener">https://id.oppo.com</a>.</p>
+<h4 id="下载申请-APP"><a href="#下载申请-APP" class="headerlink" title="下载申请 APP"></a>下载申请 APP</h4><p>从<a href="https://bbs.coloros.com/thread-1498611-1-1.html" target="_blank" rel="noopener">Find X 申请解锁 BootLoader 官方网站</a>下载解锁申请 APP.<br>安装到手机.</p>
+<h4 id="申请-1"><a href="#申请-1" class="headerlink" title="申请"></a>申请</h4><p>打开申请 APP，按照提示进行操作.</p>
+<p>等待官方审核.</p>
+<p>等待下发解锁权限.</p>
+<p>下发解锁权限后，申请APP将相关信息写入系统，即可进行下面的解锁操作.</p>
+<h3 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h3><p>设置，其他设置，备份与恢复，将重要的数据进行备份，然后将内置存储 Backup 目录拷贝到电脑.<br>同时可以将非常重要的数据如联系人通话记录短信等进行云备份.<br>解锁 BootLoader 后进行自己需要的玩机操作后可自行恢复数据.</p>
+<h3 id="解锁"><a href="#解锁" class="headerlink" title="解锁"></a>解锁</h3><h4 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h4><p>设置，关于手机，连续点击版本号，提示已打开开发者选项.</p>
+<p>设置，其他设置，开发者选项，打开 OEM 解锁和 USB 调试.</p>
+<h4 id="adb-amp-fastboot-命令"><a href="#adb-amp-fastboot-命令" class="headerlink" title="adb &amp; fastboot 命令"></a>adb &amp; fastboot 命令</h4><p>下载 <a href="https://developer.android.google.cn/studio/releases/platform-tools" target="_blank" rel="noopener">Android Sdk Platform-Tools</a>，我们将要使用其中的 adb &amp; fastboot 命令 <a href="https://dl.google.com/android/repository/platform-tools-latest-windows.zip" target="_blank" rel="noopener">windows</a> <a href="https://dl.google.com/android/repository/platform-tools-latest-linux.zip" target="_blank" rel="noopener">linux</a> <a href="https://dl.google.com/android/repository/platform-tools-latest-darwin.zip" target="_blank" rel="noopener">mac</a>.</p>
+<p>重启进入 Fastboot 模式.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">adb reboot bootloader</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2018/09/22/oppo-findx-root/find-x-bootloader-mode.jpg" alt="Find X FastBoot mode"></p>
+<p>看到 DEVICE STATE ：locked，说明此时 BootLoader 处于锁定状态.</p>
+<p><img src="/2018/09/22/oppo-findx-root/find-x-bootloader-locked.jpg" alt="Find X BootLoader locked"></p>
+<p>开始解锁咯！</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">fastboot flashing unlock</span><br></pre></td></tr></table></figure>
+<p>或者</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">fastboot flashing unlock_critical</span><br></pre></td></tr></table></figure>
+
+<p>询问是否解锁，确认解锁就使用音量键选择 UNLOCK THE BOOTLOADER，否则选择 DO NOT UNLOCK THE BOOTLOADER (此时后悔还来得及)，电源键确认.</p>
+<p><img src="/2018/09/22/oppo-findx-root/find-x-bootloader-unlocking.jpg" alt="Find X BootLoader unlocking"></p>
+<p>手机会重启进入 recovery 模式格式化 data 分区，然后自动开机.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">adb reboot bootloader</span><br></pre></td></tr></table></figure>
+<p>再次进入 Fastboot 模式，可看到 DEVICE STATE ：unlocked，说明此时 BootLoader 处于解锁状态，此时你就可以使用 fastboot flash [分区名] [文件路径]为所欲为了.</p>
+<p><img src="/2018/09/22/oppo-findx-root/find-x-bootloader-unlocked.jpg" alt="Find X BootLoader unlocked"></p>
+<h3 id="玩机"><a href="#玩机" class="headerlink" title="玩机"></a>玩机</h3><h4 id="刷入-TWRP"><a href="#刷入-TWRP" class="headerlink" title="刷入 TWRP"></a>刷入 TWRP</h4><p>在 FastBoot 模式.</p>
+<p>将 <a href="https://pan.baidu.com/s/1Nk49xtFQBHBa5a8_qOvRIg#list/path=%2Fandroid%2F%E7%AC%AC%E4%B8%89%E6%96%B9ROM%2FOPPO%20Find%20X%2Frecovery%2Ftwrp%20recovery&page=1" target="_blank" rel="noopener">twrp.img</a> 刷入 recovery 分区.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">fastboot flash recovery twrp.img</span><br></pre></td></tr></table></figure>
+<p>音量键选择 recovery mode，按电源键确认，进入 TWRP .<br><img src="/2018/09/22/oppo-findx-root/find-x-twrp-mode.jpg" alt="Find X TWRP mode"></p>
+<h4 id="TWRP相关操作"><a href="#TWRP相关操作" class="headerlink" title="TWRP相关操作"></a>TWRP相关操作</h4><p>首次进入提示是否允许修改 system,vendor，根据自己的需要进行选择.（主页-&gt;挂载-&gt;挂载系统分区只读）</p>
+<p><img src="/2018/09/22/oppo-findx-root/find-x-twrp-recovery.jpg" alt="Find X TWRP mode"></p>
+<p>双清：主页-&gt;清除-&gt;滑动恢复出厂设置（此项操作会清除你的 data 分区除内置存储外的文件）.</p>
+<p>格式化 Data：主页-&gt;清除-&gt;格式化 Data -&gt;输入 yes （此项操作会清除你的 data 分区全部文件，含内置存储.</p>
+<p>卡刷：主页-&gt;安装-&gt;浏览到自己需要的卡刷包，点击，滑动刷入.</p>
+<p>备份：主页-&gt;备份-&gt;选择自己需要备份的分区-&gt;滑动备份.</p>
+<p>还原：主页-&gt;还原-&gt;选择需要还原的版本-&gt;选择需要还原的分区-&gt;滑动还原.</p>
+<p>高级：主页-&gt;高级-&gt;文件管理;主页-&gt;高级-&gt;终端命令行.</p>
+<p>ColorOS 升级 &amp; root &amp; … ：将 ColorOS 完整卡刷包和 root 等要刷的补丁放入内置存储，直接卡刷即可，先刷 ColorOS 完整卡刷包，后刷补丁.</p>
+<p>双清刷 ROM &amp; root &amp; … ：将 ColorOS 完整卡刷包和 root 等要刷的补丁放入内置存储，双清后直接卡刷即可，先刷 ColorOS 完整卡刷包，后刷补丁.</p>
+<h4 id="玩机-1"><a href="#玩机-1" class="headerlink" title="玩机"></a>玩机</h4><p>将网盘中的 SuperSU 补丁放入内置存储，使用 TWRP recovery 刷入即可实现 root .</p>
+<p>其他补丁也可使用相同方法刷入，实现 xposed 等玩机功能.</p>
+]]></content>
       <categories>
         <category>root</category>
       </categories>
@@ -41,15 +127,68 @@
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[本站介绍]]></title>
-    <url>%2F2018%2F08%2F08%2Fhello-world%2F</url>
-    <content type="text"><![CDATA[本站为 wuxianlin 个人网站，有意见欢迎来提，有问题欢迎来问，更欢迎志同道合的朋友一起交流. 你知道吗资源转移你以前来这里查找玩机资源，现在转移到玩机页面了. 百度云你以前通过百度云共享关注最新玩机资源，现在需要关注百度云后在 APP 端查看动态. 聊一聊我玩手机玩平板，玩电视广播机顶盒，玩卫星有线无线，玩视频音乐，，，刷微博不刷朋友圈，玩小游戏不玩大游戏，打小球不打大球，会写代码不会写作文，会数学物理不会语文英语，看电视剧不看小说，，，关注 科技，，， 关注 Android 尤其是 root ，，，关注 OPPO(OnePlus/Realme) ，，， 联系wuxianlin Weibowuxianlin GitHub]]></content>
+    <title>OPPO R17 Pro 解锁 BootLoader &amp; root</title>
+    <url>/2018/11/08/oppo-r17pro-root/</url>
+    <content><![CDATA[<p>OPPO 已经开放 R17 Pro 申请解锁 BootLoader ，需要玩机的你准备好了吗？</p>
+<a id="more"></a>
+
+<h3 id="开篇三问"><a href="#开篇三问" class="headerlink" title="开篇三问"></a>开篇三问</h3><p>你知道什么是解锁 BootLoader，什么是 root 权限吗？<br>如果不知道，那建议你不要解锁 BootLoader，更不要 root.</p>
+<p>你会使用 adb 和 fastboot 吗？你会使用 TWRP 吗？你会双清、卡刷等刷机操作吗？<br>如果不会，那建议你不要解锁 BootLoader，更不要 root.</p>
+<p>你解锁 Bootloader &amp; root 后要做什么？<br>如果你连要做什么都不知道，奉劝你不要抱着好奇的心态进行尝试.</p>
+<h3 id="重要的事情说三遍"><a href="#重要的事情说三遍" class="headerlink" title="重要的事情说三遍"></a>重要的事情说三遍</h3><p>玩机有风险，刷机需谨慎.</p>
+<p>仔细阅读官方网站<a href="https://bbs.coloros.com/thread-1498611-1-1.html" target="_blank" rel="noopener">注意事项</a>.</p>
+<p>手机不开机、数据丢失等严重后果请自负，<a href="http://www.oppo.com/cn/service/map" target="_blank" rel="noopener">官方售后</a>可帮你刷回官方固件.</p>
+<h3 id="申请"><a href="#申请" class="headerlink" title="申请"></a>申请</h3><h4 id="OPPO-帐号"><a href="#OPPO-帐号" class="headerlink" title="OPPO 帐号"></a>OPPO 帐号</h4><p>如果你没有 OPPO 账号，那马上注册一个吧,<a href="https://id.oppo.com" target="_blank" rel="noopener">https://id.oppo.com</a>.</p>
+<h4 id="下载申请-APP"><a href="#下载申请-APP" class="headerlink" title="下载申请 APP"></a>下载申请 APP</h4><p>从<a href="https://bbs.coloros.com/thread-1498611-1-1.html" target="_blank" rel="noopener">R17 Pro 申请解锁 BootLoader 官方网站</a>下载解锁申请 APP.<br>安装到手机.</p>
+<h4 id="申请-1"><a href="#申请-1" class="headerlink" title="申请"></a>申请</h4><p>打开申请 APP，按照提示进行操作.</p>
+<p>等待官方审核.</p>
+<p>等待下发解锁权限.</p>
+<p>下发解锁权限后，申请APP将相关信息写入系统，即可进行下面的解锁操作.</p>
+<h3 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h3><p>设置，其他设置，备份与恢复，将重要的数据进行备份，然后将内置存储 Backup 目录拷贝到电脑.<br>同时可以将非常重要的数据如联系人通话记录短信等进行云备份.<br>解锁 BootLoader 后进行自己需要的玩机操作后可自行恢复数据.</p>
+<h3 id="解锁"><a href="#解锁" class="headerlink" title="解锁"></a>解锁</h3><h4 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h4><p>设置，关于手机，连续点击版本号，提示已打开开发者选项.</p>
+<p>设置，其他设置，开发者选项，打开 OEM 解锁和 USB 调试.</p>
+<h4 id="adb-amp-fastboot-命令"><a href="#adb-amp-fastboot-命令" class="headerlink" title="adb &amp; fastboot 命令"></a>adb &amp; fastboot 命令</h4><p>下载 <a href="https://developer.android.google.cn/studio/releases/platform-tools" target="_blank" rel="noopener">Android Sdk Platform-Tools</a>，我们将要使用其中的 adb &amp; fastboot 命令 <a href="https://dl.google.com/android/repository/platform-tools-latest-windows.zip" target="_blank" rel="noopener">windows</a> <a href="https://dl.google.com/android/repository/platform-tools-latest-linux.zip" target="_blank" rel="noopener">linux</a> <a href="https://dl.google.com/android/repository/platform-tools-latest-darwin.zip" target="_blank" rel="noopener">mac</a>.</p>
+<p>重启进入 Fastboot 模式.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">adb reboot bootloader</span><br></pre></td></tr></table></figure>
+
+<p>看到 DEVICE STATE ：locked，说明此时 BootLoader 处于锁定状态.</p>
+<p><img src="/2018/11/08/oppo-r17pro-root/r17pro-bootloader-locked.jpg" alt="R17 Pro BootLoader locked"></p>
+<p>开始解锁咯！</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">fastboot flashing unlock</span><br></pre></td></tr></table></figure>
+<p>或者</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">fastboot flashing unlock_critical</span><br></pre></td></tr></table></figure>
+
+<p>询问是否解锁，确认解锁就使用音量键选择 UNLOCK THE BOOTLOADER，否则选择 DO NOT UNLOCK THE BOOTLOADER (此时后悔还来得及)，电源键确认.</p>
+<p><img src="/2018/11/08/oppo-r17pro-root/r17pro-bootloader-unlocking.jpg" alt="R17 Pro BootLoader unlocking"></p>
+<p>手机会重启进入 recovery 模式格式化 data 分区，然后自动开机.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">adb reboot bootloader</span><br></pre></td></tr></table></figure>
+<p>再次进入 Fastboot 模式，可看到 DEVICE STATE ：unlocked，说明此时 BootLoader 处于解锁状态，此时你就可以使用 fastboot flash [分区名] [文件路径]为所欲为了.</p>
+<p><img src="/2018/11/08/oppo-r17pro-root/r17pro-bootloader-unlocked.jpg" alt="R17 Pro BootLoader unlocked"></p>
+<h3 id="玩机"><a href="#玩机" class="headerlink" title="玩机"></a>玩机</h3><h4 id="刷入-TWRP"><a href="#刷入-TWRP" class="headerlink" title="刷入 TWRP"></a>刷入 TWRP</h4><p>在 FastBoot 模式.</p>
+<p>将 <a href="https://pan.baidu.com/s/1R-7ProYUWoA8dVFQohjpOQ#list/path=%2Fandroid%2F%E7%AC%AC%E4%B8%89%E6%96%B9ROM%2FOPPO%20R17%2Frecovery-R17Pro%2Ftwrp%20recovery&page=1" target="_blank" rel="noopener">twrp.img</a> 刷入 recovery 分区.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">fastboot flash recovery twrp.img</span><br></pre></td></tr></table></figure>
+<p>音量键选择 recovery mode，按电源键确认，进入 TWRP .<br><img src="/2018/11/08/oppo-r17pro-root/r17pro-twrp-mode.jpg" alt="R17 Pro TWRP mode"></p>
+<h4 id="TWRP相关操作"><a href="#TWRP相关操作" class="headerlink" title="TWRP相关操作"></a>TWRP相关操作</h4><p>首次进入提示是否允许修改 system,vendor，根据自己的需要进行选择.（主页-&gt;挂载-&gt;挂载系统分区只读）</p>
+<p><img src="/2018/11/08/oppo-r17pro-root/r17pro-twrp-recovery.jpg" alt="R17 Pro TWRP mode"></p>
+<p>双清：主页-&gt;清除-&gt;滑动恢复出厂设置（此项操作会清除你的 data 分区除内置存储外的文件）.</p>
+<p>格式化 Data：主页-&gt;清除-&gt;格式化 Data -&gt;输入 yes （此项操作会清除你的 data 分区全部文件，含内置存储.</p>
+<p>卡刷：主页-&gt;安装-&gt;浏览到自己需要的卡刷包，点击，滑动刷入.</p>
+<p>备份：主页-&gt;备份-&gt;选择自己需要备份的分区-&gt;滑动备份.</p>
+<p>还原：主页-&gt;还原-&gt;选择需要还原的版本-&gt;选择需要还原的分区-&gt;滑动还原.</p>
+<p>高级：主页-&gt;高级-&gt;文件管理;主页-&gt;高级-&gt;终端命令行.</p>
+<p>ColorOS 升级 &amp; root &amp; … ：将 ColorOS 完整卡刷包和 root 等要刷的补丁放入内置存储，直接卡刷即可，先刷 ColorOS 完整卡刷包，后刷补丁.</p>
+<p>双清刷 ROM &amp; root &amp; … ：将 ColorOS 完整卡刷包和 root 等要刷的补丁放入内置存储，双清后直接卡刷即可，先刷 ColorOS 完整卡刷包，后刷补丁.</p>
+<h4 id="玩机-1"><a href="#玩机-1" class="headerlink" title="玩机"></a>玩机</h4><p>将网盘中的 SuperSU 补丁放入内置存储，使用 TWRP recovery 刷入即可实现 root .</p>
+<p>其他补丁也可使用相同方法刷入，实现 xposed 等玩机功能.</p>
+]]></content>
       <categories>
-        <category>闲聊</category>
+        <category>root</category>
       </categories>
       <tags>
-        <tag>闲聊</tag>
-        <tag>介绍</tag>
+        <tag>OPPO</tag>
+        <tag>root</tag>
+        <tag>BootLoader</tag>
+        <tag>R17Pro</tag>
       </tags>
   </entry>
 </search>
