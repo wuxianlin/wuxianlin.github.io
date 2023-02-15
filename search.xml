@@ -1,37 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>GSI/GKI 与 Android 玩机</title>
+    <url>/2023/02/10/android-gsi-and-gki/</url>
+    <content><![CDATA[<p>Android 新手机解锁 BootLoader 后没有刷机包可玩? 试试 GSI 和 GKI 吧!</p>
+<span id="more"></span>
+
+
+<h2 id="知识回顾"><a href="#知识回顾" class="headerlink" title="知识回顾"></a>知识回顾</h2><h3 id="Android-分区架构"><a href="#Android-分区架构" class="headerlink" title="Android 分区架构"></a>Android 分区架构</h3><p>还记得 Android 7 及以前, Android 系统的分区还很少, 如 system,cache,boot,recovery.<br>而随着 Android 架构的不断演进, Android 系统的分区不断细分.<br>system分区,因Treble项目解决Android大版本碎片化问题,拆分出vendor,并为定制化拆分出 product,system_ext等.<br>boot分区,因GKI项目解决内核碎片化问题,拆分ko等硬件文件到vendor_boot,拆分ramdisk到init_boot. </p>
+<p><img src="/2023/02/10/android-gsi-and-gki/partitions-android-r.png" alt="Android R Partitions"></p>
+<p><a href="https://source.android.google.cn/docs/core/architecture/partitions">Android 分区</a><br><a href="https://source.android.google.cn/docs/core/architecture/partitions/generic-boot">Android boot 分区</a></p>
+<h3 id="GSI"><a href="#GSI" class="headerlink" title="GSI"></a>GSI</h3><p>Google 为解决设备厂商 Android 大版本升级慢导致的碎片化等问题, 从 Android 8 开始 启用 Treble 架构, 将 vendor 与 system 解耦, 新增 vendor 分区 存放  HAL 等设备硬件相关文件, system(含 system_ext&#x2F;product ) 存放Android系统通用的文件.<br>vendor 只 依赖 system 中对应版本的 vndk 库(Vendor Native Development Kit), 所以system 可实现独立升级.</p>
+<p><img src="/2023/02/10/android-gsi-and-gki/vndk.jpg" alt="Android VNDK"></p>
+<p><a href="https://developer.android.google.cn/topic/generic-system-image">GSI（generic system image）通用系统镜像</a><br><a href="https://source.android.google.cn/docs/core/architecture/vndk">VNDK</a><br><a href="https://source.android.google.cn/docs/core/architecture/vndk/snapshot-design">VNDK snapshot</a><br><a href="https://android-developers.googleblog.com/2017/05/here-comes-treble-modular-base-for.html">Here comes Treble: A modular base for Android</a></p>
+<h3 id="GKI"><a href="#GKI" class="headerlink" title="GKI"></a>GKI</h3><p>类似  GSI, Google 为解决 Android 设备 Linux 内核的碎片化导致安全漏洞得不到及时修复等问题.<br>从 Android 11 + 5.4 版本 Linux 内核 开始 GKI 1.0, 确立基本架构, 新增  vendor_boot 分区存放  ko 等设备硬件相关文件, boot 分区仅存放通用内核(GKI), GKI 1.0设备只需要通过GKI测试.<br>从 Android 12 + 5.10 版本Linux 内核 开始 GKI 2.0, 出厂搭载 GKI.<br>从 Android 13 开始, boot 中的 ramdisk 进一步被拆分, 存放到新增的 init_boot 分区. </p>
+<p><img src="/2023/02/10/android-gsi-and-gki/generic-kernel-image-architecture.png" alt="GKI"></p>
+<p><a href="https://source.android.google.cn/docs/core/architecture/kernel/generic-kernel-image">GKI（generic kernel image）通用内核镜像</a></p>
+<h2 id="如何玩-GSI"><a href="#如何玩-GSI" class="headerlink" title="如何玩 GSI"></a>如何玩 GSI</h2><p>上面已经介绍过, system 可独立升级. 那我们下载一个可以用的 system.img, 刷进system, 不就…<br>是的,就是这么简单.当然前提是设备解锁 BootLoader.</p>
+<h3 id="DSU-Dynamic-System-Update"><a href="#DSU-Dynamic-System-Update" class="headerlink" title="DSU(Dynamic System Update)"></a>DSU(Dynamic System Update)</h3><p>Android 提供了 DSU(Dynamic System Update)功能,<br>进入开发者选项,点击DSU Loader,然后点希望使用的版本,系统自动下载,<br>下载\安装完成之后,下拉通知栏点击重启,即可.</p>
+<h3 id="刷机"><a href="#刷机" class="headerlink" title="刷机"></a>刷机</h3><p>不过瘾?那就直接刷(刷机注意备份数据不用我多说吧):</p>
+<ul>
+<li><p>下载 system.img<br>从地址下载到包(可能需要解压)得到system.img.</p>
+</li>
+<li><p>重启到刷机模式<br>非super分区的设备重启到bootloader模式:<br><code>adb reboot bootloader</code><br> super分区的设备重启的fastbootd模式:<br><code>adb reboot fastboot</code></p>
+</li>
+<li><p>开刷:<br><code>fastboot flash system system.img</code></p>
+</li>
+<li><p>恢复出厂:<br><code>fastboot -w</code><br>部分设备可能异常,可以尝试进入 recovery 执行恢复出厂设置.</p>
+</li>
+<li><p>重启, 理论上就能开机咯.<br><code>fastboot reboot</code></p>
+</li>
+</ul>
+<h3 id="Android-官方GSI"><a href="#Android-官方GSI" class="headerlink" title="Android 官方GSI"></a>Android 官方GSI</h3><p><a href="https://developer.android.google.cn/topic/generic-system-image/releases">GSI Release</a></p>
+<p>DSU 功能对应的 GSI:<br><a href="https://dl.google.com/developers/android/gsi/gsi-src.json">https://dl.google.com/developers/android/gsi/gsi-src.json</a><br>Android 11<br><a href="https://dl.google.com/developers/android/rvc/images/gsi/gsi-dsc.json">https://dl.google.com/developers/android/rvc/images/gsi/gsi-dsc.json</a><br>Android 12<br><a href="https://dl.google.com/developers/android/sc/images/gsi/gsi-dsc.json">https://dl.google.com/developers/android/sc/images/gsi/gsi-dsc.json</a><br>Android 13<br><a href="https://dl.google.com/developers/android/tm/images/gsi/gsi-dsc.json">https://dl.google.com/developers/android/tm/images/gsi/gsi-dsc.json</a>﻿</p>
+<h3 id="三方-GSI"><a href="#三方-GSI" class="headerlink" title="三方 GSI"></a>三方 GSI</h3><p>phh treble:<a href="https://github.com/phhusson/treble_experimentations/releases">下载</a> <a href="https://github.com/phhusson/treble_experimentations/wiki/Generic-System-Image-%28GSI%29-list">汇总列表</a><br>Andy Yan LineageOS GSI: <a href="https://sourceforge.net/projects/andyyan-gsi/files/">下载</a> <a href="https://forum.xda-developers.com/t/gsi-12-lineageos-19-x-gsi-a64b-64b.4358041/">帖子</a><br><a href="https://sourceforge.net/projects/nippongsi/files/">Nippon GSI</a><br><a href="https://forum.xda-developers.com/c/project-treble.7259/">Treble xda 社区</a></p>
+<h3 id="GSI-移植"><a href="#GSI-移植" class="headerlink" title="GSI 移植"></a>GSI 移植</h3><p><a href="https://github.com/erfanoabdi/ErfanGSIs">Erfan’s GSIs tool</a></p>
+<h4 id="移植注意事项"><a href="#移植注意事项" class="headerlink" title="移植注意事项"></a>移植注意事项</h4><ul>
+<li>分区:<br>如果把product\system_ext都打包到system.img,则需要新增文件<a href="https://cs.android.com/android/platform/superproject/+/master:build/make/target/product/gsi/gsi_skip_mount.cfg">etc&#x2F;init&#x2F;config&#x2F;skip_mount.cfg</a>跳过挂载设备上的product\system_ext分区.</li>
+<li>apex:<br>ro.apex.updatable属性控制挂载apex文件(true)还是直接使用apex解压的目录(false).</li>
+</ul>
+<h2 id="GKI-1"><a href="#GKI-1" class="headerlink" title="GKI"></a>GKI</h2><p>既然 boot 分区可以独立升级,那我们有很多玩法:<br>比如可以升级 Google 新版 GKI, 修改并编译内核,加入新功能…</p>
+<h3 id="查找设备对应的内核版本"><a href="#查找设备对应的内核版本" class="headerlink" title="查找设备对应的内核版本"></a>查找设备对应的内核版本</h3><ul>
+<li><p>查看内核版本<br><code>adb shell cat /proc/version</code><br>在Google官网找到对应的版本,查到版本对应的分支, 刷该分支的新版本内核试试?下载源代码编译试试?</p>
+</li>
+<li><p>举个例子:<br>我手上的某设备的内核版本:<br><code>Linux version 5.10.101-android12-9-00001-gf4c0e37dbcde-ab8596533 (build-user@build-host) (Android (7284624, based on r416183b) clang version 12.0.5 (https://android.googlesource.com/toolchain/llvm-project c935d99d7cf2016289302412d708641d52d2f7ee), LLD 12.0.5 (/buildbot/src/android/llvm-toolchain/out/llvm-project/lld c935d99d7cf2016289302412d708641d52d2f7ee)) #1 SMP PREEMPT Mon May 16 05:21:23 UTC 2022</code><br>是的,看到他的版本号是: <code>5.10.101-android12-9-00001-gf4c0e37dbcde-ab8596533</code><br>首先看大版本:5.10 + Android 12,进入<a href="https://source.android.google.cn/docs/core/architecture/kernel/gki-android12-5_10-release-builds">android12-5.10 Release Builds</a><br>然后我们看到我们的内核版本中间的g开头的字符串:<strong>gf4c0e37dbcde</strong>,把g(估计Google或者GKI的首字母?)去掉,得到f4c0e37dbcde.<br>然后在页面搜索,就能找到源代码和编译好的二进制.<br>如果你的内核版本中间的字符串不是g开头?那应该不是 GKI.</p>
+</li>
+</ul>
+<h3 id="刷入方法："><a href="#刷入方法：" class="headerlink" title="刷入方法："></a>刷入方法：</h3><ul>
+<li>重启到fastboot模式:<br><code>adb reboot bootloader</code></li>
+<li>直接开刷:<br><code>fastboot flash boot boot-xxx.img</code></li>
+<li>重启啦:<br><code>fastboot reboot</code></li>
+</ul>
+<h3 id="GKI-下载地址"><a href="#GKI-下载地址" class="headerlink" title="GKI 下载地址"></a>GKI 下载地址</h3><h4 id="Google-官方"><a href="#Google-官方" class="headerlink" title="Google 官方"></a>Google 官方</h4><p><a href="https://source.android.google.cn/docs/core/architecture/kernel/gki-release-builds">GKI release builds</a></p>
+<h3 id="GKI注意事项"><a href="#GKI注意事项" class="headerlink" title="GKI注意事项"></a>GKI注意事项</h3><p>注意区分压缩格式,我手上的设备使用的是gz压缩.</p>
+]]></content>
+      <categories>
+        <category>android</category>
+      </categories>
+      <tags>
+        <tag>android</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Android 逆向相关</title>
     <url>/2019/03/22/android-reverse-engineering/</url>
-    <content><![CDATA[<p>当你拿到Android手机的卡刷包/线刷包，你有没有想过解开它？当你眼前摆着一个APK/jar/so，你有没有想过反编译/反汇编/动态调试然后分析研究它？……</p>
-<a id="more"></a>
+    <content><![CDATA[<p>当你拿到Android手机的卡刷包&#x2F;线刷包，你有没有想过解开它？当你眼前摆着一个APK&#x2F;jar&#x2F;so，你有没有想过反编译&#x2F;反汇编&#x2F;动态调试然后分析研究它？……</p>
+<span id="more"></span>
 
-<h3 id="刷机包"><a href="#刷机包" class="headerlink" title="刷机包"></a>刷机包</h3><h4 id="sparse-img-gt-ext4-img"><a href="#sparse-img-gt-ext4-img" class="headerlink" title="sparse img -&gt; ext4 img"></a>sparse img -&gt; ext4 img</h4><p>线刷包里面找到system.img/vendor.img</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ file system.img</span><br><span class="line">system.img: Android sparse image, version: 1.0, Total of 849920 4096-byte output blocks in 2454 input chunks.</span><br></pre></td></tr></table></figure>
-<p>使用Android源码编译make simg2img得到out/host/linux-x86/bin/simg2img即可将Android的sparse image转为ext4的image</p>
-<h4 id="super-img-gt-super-ext4-img-gt-system-product-vendor-ext4-img"><a href="#super-img-gt-super-ext4-img-gt-system-product-vendor-ext4-img" class="headerlink" title="super img -&gt; super ext4 img -&gt; system product vendor ext4 img"></a>super img -&gt; super ext4 img -&gt; system product vendor ext4 img</h4><p>预装Android 10的机型一般使用<a href="https://source.android.google.cn/devices/tech/ota/dynamic_partitions" target="_blank" rel="noopener">动态分区</a><br>线刷包里面找到super.img<br>使用simg2img将super.img转为super_ext4.img<br>使用Android源码编译make lpunpack得到out/host/linux-x86/bin/lpunpack super_ext4.img super</p>
-<h4 id="dat-gt-ext4-img"><a href="#dat-gt-ext4-img" class="headerlink" title="dat -&gt; ext4 img"></a>dat -&gt; ext4 img</h4><p>卡刷包中的system.new.dat.br转system.new.dat<br>brotli –decompress system.new.dat.br –output=system.new.dat</p>
-<p>卡刷包中的system.new.dat system.patch.dat system.transfer.list转ext4 img<br><a href="https://github.com/xpirt/sdat2img" target="_blank" rel="noopener">https://github.com/xpirt/sdat2img</a></p>
-<h4 id="payload-dump"><a href="#payload-dump" class="headerlink" title="payload dump"></a>payload dump</h4><p>AB分区卡刷包相关<br><a href="https://github.com/cyxx/extract_android_ota_payload" target="_blank" rel="noopener">https://github.com/cyxx/extract_android_ota_payload</a></p>
-<h3 id="odex-oat-vdex"><a href="#odex-oat-vdex" class="headerlink" title="odex/oat/vdex"></a>odex/oat/vdex</h3><p>Android &lt;=4.4 odex to dex</p>
-<p><a href="https://github.com/JesusFreke/smali/wiki/DeodexInstructions" target="_blank" rel="noopener">https://github.com/JesusFreke/smali/wiki/DeodexInstructions</a><br><a href="https://bitbucket.org/JesusFreke/smali/downloads/" target="_blank" rel="noopener">https://bitbucket.org/JesusFreke/smali/downloads/</a></p>
-<p>Android &lt;=7 oat to dex</p>
-<p><a href="https://github.com/testwhat/SmaliEx/releases" target="_blank" rel="noopener">https://github.com/testwhat/SmaliEx/releases</a><br><a href="https://github.com/testwhat/SmaliEx" target="_blank" rel="noopener">https://github.com/testwhat/SmaliEx</a><br><a href="https://github.com/JesusFreke/smali/wiki/DeodexInstructions" target="_blank" rel="noopener">https://github.com/JesusFreke/smali/wiki/DeodexInstructions</a><br><a href="https://bitbucket.org/JesusFreke/smali/downloads/" target="_blank" rel="noopener">https://bitbucket.org/JesusFreke/smali/downloads/</a></p>
+<h3 id="刷机包"><a href="#刷机包" class="headerlink" title="刷机包"></a>刷机包</h3><h4 id="sparse-img-gt-ext4-img"><a href="#sparse-img-gt-ext4-img" class="headerlink" title="sparse img -&gt; ext4 img"></a>sparse img -&gt; ext4 img</h4><p>线刷包里面找到system.img&#x2F;vendor.img</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ file system.img</span><br><span class="line">system.img: Android sparse image, version: 1.0, Total of 849920 4096-byte output blocks in 2454 input chunks.</span><br></pre></td></tr></table></figure>
+<p>使用Android源码编译make simg2img得到out&#x2F;host&#x2F;linux-x86&#x2F;bin&#x2F;simg2img即可将Android的sparse image转为ext4的image</p>
+<h4 id="super-img-gt-super-ext4-img-gt-system-product-vendor-ext4-img"><a href="#super-img-gt-super-ext4-img-gt-system-product-vendor-ext4-img" class="headerlink" title="super img -&gt; super ext4 img -&gt; system product vendor ext4 img"></a>super img -&gt; super ext4 img -&gt; system product vendor ext4 img</h4><p>预装Android 10的机型一般使用<a href="https://source.android.google.cn/devices/tech/ota/dynamic_partitions">动态分区</a><br>线刷包里面找到super.img<br>使用simg2img将super.img转为super_ext4.img<br>使用Android源码编译make lpunpack得到out&#x2F;host&#x2F;linux-x86&#x2F;bin&#x2F;lpunpack super_ext4.img super</p>
+<h4 id="dat-gt-ext4-img"><a href="#dat-gt-ext4-img" class="headerlink" title="dat -&gt; ext4 img"></a>dat -&gt; ext4 img</h4><p>卡刷包中的system.new.dat.br转system.new.dat<br>brotli –decompress system.new.dat.br –output&#x3D;system.new.dat</p>
+<p>卡刷包中的system.new.dat system.patch.dat system.transfer.list转ext4 img<br><a href="https://github.com/xpirt/sdat2img">https://github.com/xpirt/sdat2img</a></p>
+<h4 id="payload-dump"><a href="#payload-dump" class="headerlink" title="payload dump"></a>payload dump</h4><p>AB分区卡刷包相关<br><a href="https://github.com/cyxx/extract_android_ota_payload">https://github.com/cyxx/extract_android_ota_payload</a></p>
+<h3 id="odex-x2F-oat-x2F-vdex"><a href="#odex-x2F-oat-x2F-vdex" class="headerlink" title="odex&#x2F;oat&#x2F;vdex"></a>odex&#x2F;oat&#x2F;vdex</h3><p>Android &lt;&#x3D;4.4 odex to dex</p>
+<p><a href="https://github.com/JesusFreke/smali/wiki/DeodexInstructions">https://github.com/JesusFreke/smali/wiki/DeodexInstructions</a><br><a href="https://bitbucket.org/JesusFreke/smali/downloads/">https://bitbucket.org/JesusFreke/smali/downloads/</a></p>
+<p>Android &lt;&#x3D;7 oat to dex</p>
+<p><a href="https://github.com/testwhat/SmaliEx/releases">https://github.com/testwhat/SmaliEx/releases</a><br><a href="https://github.com/testwhat/SmaliEx">https://github.com/testwhat/SmaliEx</a><br><a href="https://github.com/JesusFreke/smali/wiki/DeodexInstructions">https://github.com/JesusFreke/smali/wiki/DeodexInstructions</a><br><a href="https://bitbucket.org/JesusFreke/smali/downloads/">https://bitbucket.org/JesusFreke/smali/downloads/</a></p>
 <p>Android 8 vdex to dex</p>
-<p><a href="https://github.com/anestisb/vdexExtractor" target="_blank" rel="noopener">https://github.com/anestisb/vdexExtractor</a></p>
+<p><a href="https://github.com/anestisb/vdexExtractor">https://github.com/anestisb/vdexExtractor</a></p>
 <p>Android 9 vdex-&gt;cdex-&gt;dex</p>
-<p><a href="https://github.com/anestisb/vdexExtractor" target="_blank" rel="noopener">https://github.com/anestisb/vdexExtractor</a><br><a href="https://github.com/anestisb/vdexExtractor/issues/23" target="_blank" rel="noopener">https://github.com/anestisb/vdexExtractor/issues/23</a><br>tools/deodex/run.sh -h</p>
+<p><a href="https://github.com/anestisb/vdexExtractor">https://github.com/anestisb/vdexExtractor</a><br><a href="https://github.com/anestisb/vdexExtractor/issues/23">https://github.com/anestisb/vdexExtractor/issues/23</a><br>tools&#x2F;deodex&#x2F;run.sh -h</p>
 <h3 id="dex"><a href="#dex" class="headerlink" title="dex"></a>dex</h3><h4 id="dex转smali"><a href="#dex转smali" class="headerlink" title="dex转smali"></a>dex转smali</h4><p>apktool工具 针对 apk包括dex和资源</p>
-<p><a href="https://github.com/iBotPeaches/Apktool" target="_blank" rel="noopener">https://github.com/iBotPeaches/Apktool</a><br><a href="https://ibotpeaches.github.io/Apktool/" target="_blank" rel="noopener">https://ibotpeaches.github.io/Apktool/</a></p>
+<p><a href="https://github.com/iBotPeaches/Apktool">https://github.com/iBotPeaches/Apktool</a><br><a href="https://ibotpeaches.github.io/Apktool/">https://ibotpeaches.github.io/Apktool/</a></p>
 <p>baksmali、smali 针对dex</p>
-<p><a href="https://github.com/JesusFreke/smali" target="_blank" rel="noopener">https://github.com/JesusFreke/smali</a><br><a href="https://bitbucket.org/JesusFreke/smali/downloads/" target="_blank" rel="noopener">https://bitbucket.org/JesusFreke/smali/downloads/</a></p>
-<h4 id="dex转jar-java"><a href="#dex转jar-java" class="headerlink" title="dex转jar/java"></a>dex转jar/java</h4><p>googe enjarify工具dex转jar</p>
-<p><a href="https://github.com/google/enjarify" target="_blank" rel="noopener">https://github.com/google/enjarify</a></p>
+<p><a href="https://github.com/JesusFreke/smali">https://github.com/JesusFreke/smali</a><br><a href="https://bitbucket.org/JesusFreke/smali/downloads/">https://bitbucket.org/JesusFreke/smali/downloads/</a></p>
+<h4 id="dex转jar-x2F-java"><a href="#dex转jar-x2F-java" class="headerlink" title="dex转jar&#x2F;java"></a>dex转jar&#x2F;java</h4><p>googe enjarify工具dex转jar</p>
+<p><a href="https://github.com/google/enjarify">https://github.com/google/enjarify</a></p>
 <p>dex2jar</p>
-<p><a href="https://github.com/pxb1988/dex2jar" target="_blank" rel="noopener">https://github.com/pxb1988/dex2jar</a><br><a href="https://github.com/pxb1988/dex2jar/releases" target="_blank" rel="noopener">https://github.com/pxb1988/dex2jar/releases</a></p>
+<p><a href="https://github.com/pxb1988/dex2jar">https://github.com/pxb1988/dex2jar</a><br><a href="https://github.com/pxb1988/dex2jar/releases">https://github.com/pxb1988/dex2jar/releases</a></p>
 <p>结合jd-gui</p>
-<p><a href="https://github.com/java-decompiler/jd-gui" target="_blank" rel="noopener">https://github.com/java-decompiler/jd-gui</a><br><a href="http://jd.benow.ca/" target="_blank" rel="noopener">http://jd.benow.ca/</a></p>
-<p>二合一工具<br><a href="https://github.com/skylot/jadx" target="_blank" rel="noopener">https://github.com/skylot/jadx</a> </p>
+<p><a href="https://github.com/java-decompiler/jd-gui">https://github.com/java-decompiler/jd-gui</a><br><a href="http://jd.benow.ca/">http://jd.benow.ca/</a></p>
+<p>二合一工具<br><a href="https://github.com/skylot/jadx">https://github.com/skylot/jadx</a> </p>
 ]]></content>
       <categories>
         <category>android</category>
@@ -45,12 +106,12 @@
     <title>本站介绍</title>
     <url>/2018/08/08/hello-world/</url>
     <content><![CDATA[<p>本站为 wuxianlin 个人网站，有意见欢迎来提，有问题欢迎来问，更欢迎志同道合的朋友一起交流.</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h2 id="你知道吗"><a href="#你知道吗" class="headerlink" title="你知道吗"></a>你知道吗</h2><h3 id="资源转移"><a href="#资源转移" class="headerlink" title="资源转移"></a>资源转移</h3><p>你以前来这里查找玩机资源，现在转移到<a href="/android">玩机页面</a>了.</p>
-<h3 id="百度云"><a href="#百度云" class="headerlink" title="百度云"></a>百度云</h3><p>你以前通过<a href="http://dwz.cn/wudashen" target="_blank" rel="noopener">百度云共享</a>关注最新玩机资源，现在需要关注百度云后在 APP 端查看动态.</p>
-<h2 id="聊一聊"><a href="#聊一聊" class="headerlink" title="聊一聊"></a>聊一聊</h2><h3 id="我"><a href="#我" class="headerlink" title="我"></a>我</h3><p>玩手机玩平板，玩电视广播机顶盒，玩卫星有线无线，玩视频音乐，，，<br>刷微博不刷朋友圈，玩小游戏不玩大游戏，打小球不打大球，会写代码不会写作文，会数学物理不会语文英语，看电视剧不看小说，，，<br>关注 科技，，， 关注 Android 尤其是 root ，，，关注 OPPO(OnePlus/Realme) ，，，</p>
-<h3 id="联系"><a href="#联系" class="headerlink" title="联系"></a>联系</h3><p><a href="https://weibo.com/wuxianlin000000" target="_blank" rel="noopener">wuxianlin Weibo</a><br><a href="https://github.com/wuxianlin" target="_blank" rel="noopener">wuxianlin GitHub</a></p>
+<h3 id="百度云"><a href="#百度云" class="headerlink" title="百度云"></a>百度云</h3><p>你以前通过<a href="http://dwz.cn/wudashen">百度云共享</a>关注最新玩机资源，现在需要关注百度云后在 APP 端查看动态.</p>
+<h2 id="聊一聊"><a href="#聊一聊" class="headerlink" title="聊一聊"></a>聊一聊</h2><h3 id="我"><a href="#我" class="headerlink" title="我"></a>我</h3><p>玩手机玩平板，玩电视广播机顶盒，玩卫星有线无线，玩视频音乐，，，<br>刷微博不刷朋友圈，玩小游戏不玩大游戏，打小球不打大球，会写代码不会写作文，会数学物理不会语文英语，看电视剧不看小说，，，<br>关注 科技，，， 关注 Android 尤其是 root ，，，关注 OPPO(OnePlus&#x2F;Realme) ，，，</p>
+<h3 id="联系"><a href="#联系" class="headerlink" title="联系"></a>联系</h3><p><a href="https://weibo.com/wuxianlin000000">wuxianlin Weibo</a><br><a href="https://github.com/wuxianlin">wuxianlin GitHub</a></p>
 ]]></content>
       <categories>
         <category>闲聊</category>
@@ -64,16 +125,16 @@
     <title>OPPO Find X 解锁 BootLoader &amp; root</title>
     <url>/2018/09/22/oppo-findx-root/</url>
     <content><![CDATA[<p>OPPO 已经开放 Find X 申请解锁 BootLoader ，需要玩机的你准备好了吗？</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h3 id="开篇三问"><a href="#开篇三问" class="headerlink" title="开篇三问"></a>开篇三问</h3><p>你知道什么是解锁 BootLoader，什么是 root 权限吗？<br>如果不知道，那建议你不要解锁 BootLoader，更不要 root.</p>
 <p>你会使用 adb 和 fastboot 吗？你会使用 TWRP 吗？你会双清、卡刷等刷机操作吗？<br>如果不会，那建议你不要解锁 BootLoader，更不要 root.</p>
 <p>你解锁 Bootloader &amp; root 后要做什么？<br>如果你连要做什么都不知道，奉劝你不要抱着好奇的心态进行尝试.</p>
 <h3 id="重要的事情说三遍"><a href="#重要的事情说三遍" class="headerlink" title="重要的事情说三遍"></a>重要的事情说三遍</h3><p>玩机有风险，刷机需谨慎.</p>
-<p>仔细阅读官方网站<a href="https://bbs.coloros.com/thread-1498611-1-1.html" target="_blank" rel="noopener">注意事项</a>.</p>
-<p>手机不开机、数据丢失等严重后果请自负，<a href="http://www.oppo.com/cn/service/map" target="_blank" rel="noopener">官方售后</a>可帮你刷回官方固件.</p>
-<h3 id="申请"><a href="#申请" class="headerlink" title="申请"></a>申请</h3><h4 id="OPPO-帐号"><a href="#OPPO-帐号" class="headerlink" title="OPPO 帐号"></a>OPPO 帐号</h4><p>如果你没有 OPPO 账号，那马上注册一个吧,<a href="https://id.oppo.com" target="_blank" rel="noopener">https://id.oppo.com</a>.</p>
-<h4 id="下载申请-APP"><a href="#下载申请-APP" class="headerlink" title="下载申请 APP"></a>下载申请 APP</h4><p>从<a href="https://bbs.coloros.com/thread-1498611-1-1.html" target="_blank" rel="noopener">Find X 申请解锁 BootLoader 官方网站</a>下载解锁申请 APP.<br>安装到手机.</p>
+<p>仔细阅读官方网站<a href="https://www.oppo.cn/thread-397164526-1">注意事项</a>.</p>
+<p>手机不开机、数据丢失等严重后果请自负，<a href="http://www.oppo.com/cn/service/map">官方售后</a>可帮你刷回官方固件.</p>
+<h3 id="申请"><a href="#申请" class="headerlink" title="申请"></a>申请</h3><h4 id="OPPO-帐号"><a href="#OPPO-帐号" class="headerlink" title="OPPO 帐号"></a>OPPO 帐号</h4><p>如果你没有 OPPO 账号，那马上注册一个吧,<a href="https://id.oppo.com/">https://id.oppo.com</a>.</p>
+<h4 id="下载申请-APP"><a href="#下载申请-APP" class="headerlink" title="下载申请 APP"></a>下载申请 APP</h4><p>从<a href="https://www.oppo.cn/thread-397164526-1">Find X 申请解锁 BootLoader 官方网站</a>下载解锁申请 APP.<br>安装到手机.</p>
 <h4 id="申请-1"><a href="#申请-1" class="headerlink" title="申请"></a>申请</h4><p>打开申请 APP，按照提示进行操作.</p>
 <p>等待官方审核.</p>
 <p>等待下发解锁权限.</p>
@@ -81,27 +142,27 @@
 <h3 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h3><p>设置，其他设置，备份与恢复，将重要的数据进行备份，然后将内置存储 Backup 目录拷贝到电脑.<br>同时可以将非常重要的数据如联系人通话记录短信等进行云备份.<br>解锁 BootLoader 后进行自己需要的玩机操作后可自行恢复数据.</p>
 <h3 id="解锁"><a href="#解锁" class="headerlink" title="解锁"></a>解锁</h3><h4 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h4><p>设置，关于手机，连续点击版本号，提示已打开开发者选项.</p>
 <p>设置，其他设置，开发者选项，打开 OEM 解锁和 USB 调试.</p>
-<h4 id="adb-amp-fastboot-命令"><a href="#adb-amp-fastboot-命令" class="headerlink" title="adb &amp; fastboot 命令"></a>adb &amp; fastboot 命令</h4><p>下载 <a href="https://developer.android.google.cn/studio/releases/platform-tools" target="_blank" rel="noopener">Android Sdk Platform-Tools</a>，我们将要使用其中的 adb &amp; fastboot 命令 <a href="https://dl.google.com/android/repository/platform-tools-latest-windows.zip" target="_blank" rel="noopener">windows</a> <a href="https://dl.google.com/android/repository/platform-tools-latest-linux.zip" target="_blank" rel="noopener">linux</a> <a href="https://dl.google.com/android/repository/platform-tools-latest-darwin.zip" target="_blank" rel="noopener">mac</a>.</p>
+<h4 id="adb-amp-fastboot-命令"><a href="#adb-amp-fastboot-命令" class="headerlink" title="adb &amp; fastboot 命令"></a>adb &amp; fastboot 命令</h4><p>下载 <a href="https://developer.android.google.cn/studio/releases/platform-tools">Android Sdk Platform-Tools</a>，我们将要使用其中的 adb &amp; fastboot 命令 <a href="https://dl.google.com/android/repository/platform-tools-latest-windows.zip">windows</a> <a href="https://dl.google.com/android/repository/platform-tools-latest-linux.zip">linux</a> <a href="https://dl.google.com/android/repository/platform-tools-latest-darwin.zip">mac</a>.</p>
 <p>重启进入 Fastboot 模式.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">adb reboot bootloader</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb reboot bootloader</span><br></pre></td></tr></table></figure>
 
 <p><img src="/2018/09/22/oppo-findx-root/find-x-bootloader-mode.jpg" alt="Find X FastBoot mode"></p>
 <p>看到 DEVICE STATE ：locked，说明此时 BootLoader 处于锁定状态.</p>
 <p><img src="/2018/09/22/oppo-findx-root/find-x-bootloader-locked.jpg" alt="Find X BootLoader locked"></p>
 <p>开始解锁咯！</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">fastboot flashing unlock</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">fastboot flashing unlock</span><br></pre></td></tr></table></figure>
 <p>或者</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">fastboot flashing unlock_critical</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">fastboot flashing unlock_critical</span><br></pre></td></tr></table></figure>
 
 <p>询问是否解锁，确认解锁就使用音量键选择 UNLOCK THE BOOTLOADER，否则选择 DO NOT UNLOCK THE BOOTLOADER (此时后悔还来得及)，电源键确认.</p>
 <p><img src="/2018/09/22/oppo-findx-root/find-x-bootloader-unlocking.jpg" alt="Find X BootLoader unlocking"></p>
 <p>手机会重启进入 recovery 模式格式化 data 分区，然后自动开机.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">adb reboot bootloader</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb reboot bootloader</span><br></pre></td></tr></table></figure>
 <p>再次进入 Fastboot 模式，可看到 DEVICE STATE ：unlocked，说明此时 BootLoader 处于解锁状态，此时你就可以使用 fastboot flash [分区名] [文件路径]为所欲为了.</p>
 <p><img src="/2018/09/22/oppo-findx-root/find-x-bootloader-unlocked.jpg" alt="Find X BootLoader unlocked"></p>
 <h3 id="玩机"><a href="#玩机" class="headerlink" title="玩机"></a>玩机</h3><h4 id="刷入-TWRP"><a href="#刷入-TWRP" class="headerlink" title="刷入 TWRP"></a>刷入 TWRP</h4><p>在 FastBoot 模式.</p>
-<p>将 <a href="https://pan.baidu.com/s/1Nk49xtFQBHBa5a8_qOvRIg#list/path=%2Fandroid%2F%E7%AC%AC%E4%B8%89%E6%96%B9ROM%2FOPPO%20Find%20X%2Frecovery%2Ftwrp%20recovery&page=1" target="_blank" rel="noopener">twrp.img</a> 刷入 recovery 分区.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">fastboot flash recovery twrp.img</span><br></pre></td></tr></table></figure>
+<p>将 <a href="https://pan.baidu.com/s/1Nk49xtFQBHBa5a8_qOvRIg#list/path=%2Fandroid%2F%E7%AC%AC%E4%B8%89%E6%96%B9ROM%2FOPPO%20Find%20X%2Frecovery%2Ftwrp%20recovery&page=1">twrp.img</a> 刷入 recovery 分区.</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">fastboot flash recovery twrp.img</span><br></pre></td></tr></table></figure>
 <p>音量键选择 recovery mode，按电源键确认，进入 TWRP .<br><img src="/2018/09/22/oppo-findx-root/find-x-twrp-mode.jpg" alt="Find X TWRP mode"></p>
 <h4 id="TWRP相关操作"><a href="#TWRP相关操作" class="headerlink" title="TWRP相关操作"></a>TWRP相关操作</h4><p>首次进入提示是否允许修改 system,vendor，根据自己的需要进行选择.（主页-&gt;挂载-&gt;挂载系统分区只读）</p>
 <p><img src="/2018/09/22/oppo-findx-root/find-x-twrp-recovery.jpg" alt="Find X TWRP mode"></p>
@@ -130,16 +191,16 @@
     <title>OPPO R17 Pro 解锁 BootLoader &amp; root</title>
     <url>/2018/11/08/oppo-r17pro-root/</url>
     <content><![CDATA[<p>OPPO 已经开放 R17 Pro 申请解锁 BootLoader ，需要玩机的你准备好了吗？</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h3 id="开篇三问"><a href="#开篇三问" class="headerlink" title="开篇三问"></a>开篇三问</h3><p>你知道什么是解锁 BootLoader，什么是 root 权限吗？<br>如果不知道，那建议你不要解锁 BootLoader，更不要 root.</p>
 <p>你会使用 adb 和 fastboot 吗？你会使用 TWRP 吗？你会双清、卡刷等刷机操作吗？<br>如果不会，那建议你不要解锁 BootLoader，更不要 root.</p>
 <p>你解锁 Bootloader &amp; root 后要做什么？<br>如果你连要做什么都不知道，奉劝你不要抱着好奇的心态进行尝试.</p>
 <h3 id="重要的事情说三遍"><a href="#重要的事情说三遍" class="headerlink" title="重要的事情说三遍"></a>重要的事情说三遍</h3><p>玩机有风险，刷机需谨慎.</p>
-<p>仔细阅读官方网站<a href="https://bbs.coloros.com/thread-1498611-1-1.html" target="_blank" rel="noopener">注意事项</a>.</p>
-<p>手机不开机、数据丢失等严重后果请自负，<a href="http://www.oppo.com/cn/service/map" target="_blank" rel="noopener">官方售后</a>可帮你刷回官方固件.</p>
-<h3 id="申请"><a href="#申请" class="headerlink" title="申请"></a>申请</h3><h4 id="OPPO-帐号"><a href="#OPPO-帐号" class="headerlink" title="OPPO 帐号"></a>OPPO 帐号</h4><p>如果你没有 OPPO 账号，那马上注册一个吧,<a href="https://id.oppo.com" target="_blank" rel="noopener">https://id.oppo.com</a>.</p>
-<h4 id="下载申请-APP"><a href="#下载申请-APP" class="headerlink" title="下载申请 APP"></a>下载申请 APP</h4><p>从<a href="https://bbs.coloros.com/thread-1498611-1-1.html" target="_blank" rel="noopener">R17 Pro 申请解锁 BootLoader 官方网站</a>下载解锁申请 APP.<br>安装到手机.</p>
+<p>仔细阅读官方网站<a href="https://www.oppo.cn/thread-397164526-1">注意事项</a>.</p>
+<p>手机不开机、数据丢失等严重后果请自负，<a href="http://www.oppo.com/cn/service/map">官方售后</a>可帮你刷回官方固件.</p>
+<h3 id="申请"><a href="#申请" class="headerlink" title="申请"></a>申请</h3><h4 id="OPPO-帐号"><a href="#OPPO-帐号" class="headerlink" title="OPPO 帐号"></a>OPPO 帐号</h4><p>如果你没有 OPPO 账号，那马上注册一个吧,<a href="https://id.oppo.com/">https://id.oppo.com</a>.</p>
+<h4 id="下载申请-APP"><a href="#下载申请-APP" class="headerlink" title="下载申请 APP"></a>下载申请 APP</h4><p>从<a href="https://www.oppo.cn/thread-397164526-1">R17 Pro 申请解锁 BootLoader 官方网站</a>下载解锁申请 APP.<br>安装到手机.</p>
 <h4 id="申请-1"><a href="#申请-1" class="headerlink" title="申请"></a>申请</h4><p>打开申请 APP，按照提示进行操作.</p>
 <p>等待官方审核.</p>
 <p>等待下发解锁权限.</p>
@@ -147,26 +208,26 @@
 <h3 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h3><p>设置，其他设置，备份与恢复，将重要的数据进行备份，然后将内置存储 Backup 目录拷贝到电脑.<br>同时可以将非常重要的数据如联系人通话记录短信等进行云备份.<br>解锁 BootLoader 后进行自己需要的玩机操作后可自行恢复数据.</p>
 <h3 id="解锁"><a href="#解锁" class="headerlink" title="解锁"></a>解锁</h3><h4 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h4><p>设置，关于手机，连续点击版本号，提示已打开开发者选项.</p>
 <p>设置，其他设置，开发者选项，打开 OEM 解锁和 USB 调试.</p>
-<h4 id="adb-amp-fastboot-命令"><a href="#adb-amp-fastboot-命令" class="headerlink" title="adb &amp; fastboot 命令"></a>adb &amp; fastboot 命令</h4><p>下载 <a href="https://developer.android.google.cn/studio/releases/platform-tools" target="_blank" rel="noopener">Android Sdk Platform-Tools</a>，我们将要使用其中的 adb &amp; fastboot 命令 <a href="https://dl.google.com/android/repository/platform-tools-latest-windows.zip" target="_blank" rel="noopener">windows</a> <a href="https://dl.google.com/android/repository/platform-tools-latest-linux.zip" target="_blank" rel="noopener">linux</a> <a href="https://dl.google.com/android/repository/platform-tools-latest-darwin.zip" target="_blank" rel="noopener">mac</a>.</p>
+<h4 id="adb-amp-fastboot-命令"><a href="#adb-amp-fastboot-命令" class="headerlink" title="adb &amp; fastboot 命令"></a>adb &amp; fastboot 命令</h4><p>下载 <a href="https://developer.android.google.cn/studio/releases/platform-tools">Android Sdk Platform-Tools</a>，我们将要使用其中的 adb &amp; fastboot 命令 <a href="https://dl.google.com/android/repository/platform-tools-latest-windows.zip">windows</a> <a href="https://dl.google.com/android/repository/platform-tools-latest-linux.zip">linux</a> <a href="https://dl.google.com/android/repository/platform-tools-latest-darwin.zip">mac</a>.</p>
 <p>重启进入 Fastboot 模式.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">adb reboot bootloader</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb reboot bootloader</span><br></pre></td></tr></table></figure>
 
 <p>看到 DEVICE STATE ：locked，说明此时 BootLoader 处于锁定状态.</p>
 <p><img src="/2018/11/08/oppo-r17pro-root/r17pro-bootloader-locked.jpg" alt="R17 Pro BootLoader locked"></p>
 <p>开始解锁咯！</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">fastboot flashing unlock</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">fastboot flashing unlock</span><br></pre></td></tr></table></figure>
 <p>或者</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">fastboot flashing unlock_critical</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">fastboot flashing unlock_critical</span><br></pre></td></tr></table></figure>
 
 <p>询问是否解锁，确认解锁就使用音量键选择 UNLOCK THE BOOTLOADER，否则选择 DO NOT UNLOCK THE BOOTLOADER (此时后悔还来得及)，电源键确认.</p>
 <p><img src="/2018/11/08/oppo-r17pro-root/r17pro-bootloader-unlocking.jpg" alt="R17 Pro BootLoader unlocking"></p>
 <p>手机会重启进入 recovery 模式格式化 data 分区，然后自动开机.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">adb reboot bootloader</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb reboot bootloader</span><br></pre></td></tr></table></figure>
 <p>再次进入 Fastboot 模式，可看到 DEVICE STATE ：unlocked，说明此时 BootLoader 处于解锁状态，此时你就可以使用 fastboot flash [分区名] [文件路径]为所欲为了.</p>
 <p><img src="/2018/11/08/oppo-r17pro-root/r17pro-bootloader-unlocked.jpg" alt="R17 Pro BootLoader unlocked"></p>
 <h3 id="玩机"><a href="#玩机" class="headerlink" title="玩机"></a>玩机</h3><h4 id="刷入-TWRP"><a href="#刷入-TWRP" class="headerlink" title="刷入 TWRP"></a>刷入 TWRP</h4><p>在 FastBoot 模式.</p>
-<p>将 <a href="https://pan.baidu.com/s/1R-7ProYUWoA8dVFQohjpOQ#list/path=%2Fandroid%2F%E7%AC%AC%E4%B8%89%E6%96%B9ROM%2FOPPO%20R17%2Frecovery-R17Pro%2Ftwrp%20recovery&page=1" target="_blank" rel="noopener">twrp.img</a> 刷入 recovery 分区.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">fastboot flash recovery twrp.img</span><br></pre></td></tr></table></figure>
+<p>将 <a href="https://pan.baidu.com/s/1R-7ProYUWoA8dVFQohjpOQ#list/path=%2Fandroid%2F%E7%AC%AC%E4%B8%89%E6%96%B9ROM%2FOPPO%20R17%2Frecovery-R17Pro%2Ftwrp%20recovery&page=1">twrp.img</a> 刷入 recovery 分区.</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">fastboot flash recovery twrp.img</span><br></pre></td></tr></table></figure>
 <p>音量键选择 recovery mode，按电源键确认，进入 TWRP .<br><img src="/2018/11/08/oppo-r17pro-root/r17pro-twrp-mode.jpg" alt="R17 Pro TWRP mode"></p>
 <h4 id="TWRP相关操作"><a href="#TWRP相关操作" class="headerlink" title="TWRP相关操作"></a>TWRP相关操作</h4><p>首次进入提示是否允许修改 system,vendor，根据自己的需要进行选择.（主页-&gt;挂载-&gt;挂载系统分区只读）</p>
 <p><img src="/2018/11/08/oppo-r17pro-root/r17pro-twrp-recovery.jpg" alt="R17 Pro TWRP mode"></p>
