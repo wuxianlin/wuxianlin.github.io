@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wuxianlin.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="HarmonyOS Next(Based on OpenHarmony)公测了，微信、QQ也都适配了，打算研究研究OpenHarmony，先下份代码，编译qemu镜像玩玩，没想到居然有坑，记录一下，供参考.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenHarmony 5.0 qemu 编译记录">
+<meta property="og:url" content="https://wuxianlin.com/2024/10/19/openharmony5-qemu-build/index.html">
+<meta property="og:site_name" content="wuxianlin">
+<meta property="og:description" content="HarmonyOS Next(Based on OpenHarmony)公测了，微信、QQ也都适配了，打算研究研究OpenHarmony，先下份代码，编译qemu镜像玩玩，没想到居然有坑，记录一下，供参考.">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-10-19T11:00:00.000Z">
+<meta property="article:modified_time" content="2024-10-19T11:00:00.000Z">
+<meta property="article:author" content="wuxianlin">
+<meta property="article:tag" content="openharmony">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://wuxianlin.com/2024/10/19/openharmony5-qemu-build/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://wuxianlin.com/2024/10/19/openharmony5-qemu-build/","path":"2024/10/19/openharmony5-qemu-build/","title":"OpenHarmony 5.0 qemu 编译记录"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>OpenHarmony 5.0 qemu 编译记录 | wuxianlin</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">wuxianlin</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-links"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>链接</a></li><li class="menu-item menu-item-android"><a href="/android/" rel="section"><i class="fa fa-mobile fa-fw"></i>玩机</a></li><li class="menu-item menu-item-tv"><a href="/tv/" rel="section"><i class="fa fa-tv fa-fw"></i>电视</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%BA%90%E7%A0%81"><span class="nav-number">1.</span> <span class="nav-text">获取源码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BDrepo"><span class="nav-number">1.1.</span> <span class="nav-text">下载repo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8repo%E4%B8%8B%E8%BD%BD%E4%BB%A3%E7%A0%81"><span class="nav-number">1.2.</span> <span class="nav-text">使用repo下载代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD%E5%8E%8B%E7%BC%A9%E5%8C%85"><span class="nav-number">1.3.</span> <span class="nav-text">下载压缩包</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83"><span class="nav-number">2.</span> <span class="nav-text">配置编译环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%8B%E5%8A%A8%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83"><span class="nav-number">2.1.</span> <span class="nav-text">手动配置环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker%E7%8E%AF%E5%A2%83"><span class="nav-number">2.2.</span> <span class="nav-text">Docker环境</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%84%E5%BB%BA"><span class="nav-number">3.</span> <span class="nav-text">构建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E6%9E%84%E5%BB%BA"><span class="nav-number">3.1.</span> <span class="nav-text">开始构建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E6%8A%A5%E9%94%99%E8%A7%A3%E5%86%B3"><span class="nav-number">3.2.</span> <span class="nav-text">编译报错解决</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#subsystem-name-config-incorrect"><span class="nav-number">3.2.1.</span> <span class="nav-text">subsystem name config incorrect</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#find-component-failed"><span class="nav-number">3.2.2.</span> <span class="nav-text">find component failed</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Undefined-identifier-wifi-ffrt-enable"><span class="nav-number">3.2.3.</span> <span class="nav-text">Undefined identifier wifi_ffrt_enable</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91%E6%8A%A5%E9%94%99"><span class="nav-number">3.2.4.</span> <span class="nav-text">内核编译报错</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E5%BB%BA%E6%88%90%E5%8A%9F"><span class="nav-number">3.3.</span> <span class="nav-text">构建成功</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.4.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">wuxianlin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wuxianlin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wuxianlin" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wuxianlinwxl@gmail.com" title="E-Mail → mailto:wuxianlinwxl@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/wuxianlin000000" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;wuxianlin000000" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wuxianlin.com/2024/10/19/openharmony5-qemu-build/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="wuxianlin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wuxianlin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="OpenHarmony 5.0 qemu 编译记录 | wuxianlin">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          OpenHarmony 5.0 qemu 编译记录
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-10-19 19:00:00" itemprop="dateCreated datePublished" datetime="2024-10-19T19:00:00+08:00">2024-10-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/openharmony/" itemprop="url" rel="index"><span itemprop="name">openharmony</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>HarmonyOS Next(Based on OpenHarmony)公测了，微信、QQ也都适配了，打算研究研究OpenHarmony，先下份代码，编译qemu镜像玩玩，没想到居然有坑，记录一下，供参考.</p>
+<span id="more"></span>
+
+<p>整体参考OpenHarmony的<a target="_blank" rel="noopener" href="https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/quick-start/Readme-CN.md">快速入门</a>文档.<br>从官方文档看到，OpenHarmony编译，支持IDE环境、也支持命令行环境，支持Ubuntu、也支持Windows. 由于习惯使用Ubuntu和命令行，我先尝试基于Ubuntu系统、使用命令行编译.</p>
+<h2 id="获取源码"><a href="#获取源码" class="headerlink" title="获取源码"></a>获取源码</h2><h3 id="下载repo"><a href="#下载repo" class="headerlink" title="下载repo"></a>下载repo</h3><p>玩过AOSP源码的同学，对repo工具应该不陌生. repo（<a target="_blank" rel="noopener" href="https://source.android.google.cn/docs/setup/download/source-control-tools">源代码控制工具</a>,<a target="_blank" rel="noopener" href="https://source.android.google.cn/docs/setup/reference/repo">Repo 命令参考资料</a>,<a target="_blank" rel="noopener" href="https://github.com/aosp-mirror/tools_repo">repo源代码</a>）是Android为了方便管理多个git库而开发的Python脚本.</p>
+<p>参考OpenHarmony的<a target="_blank" rel="noopener" href="https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/quick-start/quickstart-pkg-sourcecode.md">获取源码</a>文档，我们需要安装git、git-lfs，配置git，下载repo工具，并加入PATH环境变量，这一步完成，我们就可以使用repo工具了.</p>
+<h3 id="使用repo下载代码"><a href="#使用repo下载代码" class="headerlink" title="使用repo下载代码"></a>使用repo下载代码</h3><p>我希望同步openharmony-5.0的代码，所以使用如下命令：<br>本地创建新的目录，用于存放源代码.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/openharmony-5.0</span><br><span class="line">cd ~/openharmony-5.0</span><br></pre></td></tr></table></figure>
+<p>开始下载</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">repo init -u https://gitee.com/openharmony/manifest.git -b OpenHarmony-5.0.1-Release --no-repo-verify</span><br><span class="line">repo sync -c</span><br><span class="line">repo forall -c &#x27;git lfs pull&#x27;</span><br></pre></td></tr></table></figure>
+<p>下载完成后，目录下能看到很多文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ ls ~/openharmony-5.0</span><br><span class="line">applications  build.py       device   foundation  napi_generator  qemu-run</span><br><span class="line">arkcompiler   build.sh       docs     ide         out             test</span><br><span class="line">base          commonlibrary  domains  interface   prebuilts       third_party</span><br><span class="line">build         developtools   drivers  kernel      productdefine   vendor</span><br></pre></td></tr></table></figure>
+<p>然后，还需要执行prebuilts脚本，这个脚本会将一些编译工具压缩包下载到与源代码目录同级的~&#x2F;openharmony_prebuilts目录，并解压、安装到源代码目录.<br><code>bash build/prebuilts_download.sh</code></p>
+<h3 id="下载压缩包"><a href="#下载压缩包" class="headerlink" title="下载压缩包"></a>下载压缩包</h3><p>如果repo工具使用存在问题，还可以选择下载压缩包，解压.</p>
+<p>例如<a target="_blank" rel="noopener" href="https://repo.huaweicloud.com/openharmony/os/5.0.0-Release/code-v5.0.0-Release.tar.gz">OpenHarmony-v5.0.0源代码压缩包</a>从<a target="_blank" rel="noopener" href="https://gitee.com/openharmony/docs/blob/master/zh-cn/release-notes/OpenHarmony-v5.0.0-release.md#%E4%BB%8E%E9%95%9C%E5%83%8F%E7%AB%99%E7%82%B9%E8%8E%B7%E5%8F%96">5.0发布文档</a>可以找到. 下载完成后，解压即可拿到源代码.<br><code>tar -xzf code-v5.0.0-Release.tar.gz</code></p>
+<h2 id="配置编译环境"><a href="#配置编译环境" class="headerlink" title="配置编译环境"></a>配置编译环境</h2><h3 id="手动配置环境"><a href="#手动配置环境" class="headerlink" title="手动配置环境"></a>手动配置环境</h3><p>参考<a target="_blank" rel="noopener" href="https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/quick-start/quickstart-pkg-prepare.md">准备开发环境</a>，<a target="_blank" rel="noopener" href="https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/quick-start/quickstart-pkg-install-package.md">安装库和工具集</a>，安装相关工具.</p>
+<h3 id="Docker环境"><a href="#Docker环境" class="headerlink" title="Docker环境"></a>Docker环境</h3><p>OpenHarmony为开发者提供了Docker环境，以帮助开发者快速完成复杂的开发环境准备工作，很适合我们这种洁癖患者.<br>参考<a target="_blank" rel="noopener" href="https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/get-code/gettools-acquire.md">Docker编译环境</a><br>安装docker<br><code>sudo apt install docker.io</code><br>获取docker镜像<br><code>docker pull swr.cn-south-1.myhuaweicloud.com/openharmony-docker/docker_oh_standard:3.2</code><br>进入docker构建环境<br><code>docker run -it -v $(pwd):/home/openharmony swr.cn-south-1.myhuaweicloud.com/openharmony-docker/docker_oh_standard:3.2</code></p>
+<h2 id="构建"><a href="#构建" class="headerlink" title="构建"></a>构建</h2><p>我们尝试构建qemu的镜像，qemu的<a target="_blank" rel="noopener" href="https://gitee.com/openharmony/device_qemu">device</a>和<a target="_blank" rel="noopener" href="https://gitee.com/openharmony/vendor_ohemu">vendor</a>已经跟随源代码同步到了device&#x2F;qemu和vendor&#x2F;ohemu</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ ls device/qemu</span><br><span class="line">arm_mps2_an386  drivers   LICENSE    README_zh.md  SmartL_E802</span><br><span class="line">arm_mps3_an547  esp32     OAT.xml    riscv32_virt  x86_64_virt</span><br><span class="line">arm_virt        hardware  README.md  riscv64_virt</span><br><span class="line">$ ls vendor/ohemu</span><br><span class="line">common                      qemu_mini_system_demo</span><br><span class="line">LICENSE                     qemu_riscv32_mini_system_demo</span><br><span class="line">OAT.xml                     qemu_riscv64_linux_min</span><br><span class="line">qemu_arm64_linux_min        qemu_small_system_demo</span><br><span class="line">qemu_arm_linux_headless     qemu_x86_64_linux_min</span><br><span class="line">qemu_arm_linux_min          qemu_xtensa_mini_system_demo</span><br><span class="line">qemu_ca7_mini_system_demo   README.md</span><br><span class="line">qemu_cm55_mini_system_demo  README_zh.md</span><br><span class="line">qemu_csky_mini_system_demo</span><br></pre></td></tr></table></figure>
+
+<h3 id="开始构建"><a href="#开始构建" class="headerlink" title="开始构建"></a>开始构建</h3><p>尝试构建x86_64架构的qemu镜像，参考<a target="_blank" rel="noopener" href="https://gitee.com/openharmony/device_qemu/tree/OpenHarmony-5.0.0-Release/x86_64_virt/linux">README</a><br>执行build.sh脚本即可开始构建.<br><code>./build.sh --product-name qemu-x86_64-linux-min --ccache --jobs 4</code></p>
+<h3 id="编译报错解决"><a href="#编译报错解决" class="headerlink" title="编译报错解决"></a>编译报错解决</h3><p>不知道是我的问题，还是OpenHarmony的源代码问题，关键我下载的是Release分支的代码，居然编译报错，，，没办法，只能想办法解决.</p>
+<h4 id="subsystem-name-config-incorrect"><a href="#subsystem-name-config-incorrect" class="headerlink" title="subsystem name config incorrect"></a>subsystem name config incorrect</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">[OHOS ERROR] Traceback (most recent call last):</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/containers/status.py&quot;, line 47, in wrapper</span><br><span class="line">[OHOS ERROR]     return func(*args, **kwargs)</span><br><span class="line">[OHOS ERROR]            ^^^^^^^^^^^^^^^^^^^^^</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/modules/ohos_build_module.py&quot;, line 67, in run</span><br><span class="line">[OHOS ERROR]     raise exception</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/modules/ohos_build_module.py&quot;, line 65, in run</span><br><span class="line">[OHOS ERROR]     super().run()</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/modules/interface/build_module_interface.py&quot;, line 70, in run</span><br><span class="line">[OHOS ERROR]     raise exception</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/modules/interface/build_module_interface.py&quot;, line 66, in run</span><br><span class="line">[OHOS ERROR]     self._load()</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/modules/ohos_build_module.py&quot;, line 83, in _load</span><br><span class="line">[OHOS ERROR]     self.loader.run()</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/services/interface/load_interface.py&quot;, line 50, in run</span><br><span class="line">[OHOS ERROR]     self.__post_init__()</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/services/loader.py&quot;, line 117, in __post_init__</span><br><span class="line">[OHOS ERROR]     self.parts_config_info = load_ohos_build.get_parts_info(</span><br><span class="line">[OHOS ERROR]                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/util/loader/load_ohos_build.py&quot;, line 914, in get_parts_info</span><br><span class="line">[OHOS ERROR]     _parts_variants = build_loader.parts_variants()</span><br><span class="line">[OHOS ERROR]                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/util/loader/load_ohos_build.py&quot;, line 504, in parts_variants</span><br><span class="line">[OHOS ERROR]     self.parse()</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/util/loader/load_ohos_build.py&quot;, line 495, in parse</span><br><span class="line">[OHOS ERROR]     subsystem_config, parts_path_dict = self._merge_build_config()</span><br><span class="line">[OHOS ERROR]                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/util/loader/load_ohos_build.py&quot;, line 625, in _merge_build_config</span><br><span class="line">[OHOS ERROR]     raise OHOSException(&quot;subsystem name config incorrect in &#x27;&#123;&#125;&#x27;, build file subsystem name is &#123;&#125;,&quot;</span><br><span class="line">[OHOS ERROR] exceptions.ohos_exception.OHOSException: subsystem name config incorrect in &#x27;/home/openharmony/device/qemu/x86_64_virt/linux/ohos.build&#x27;, build file subsystem name is device_x86_64_virt,configured subsystem name is device_qemu-x86_64-linux.</span><br><span class="line">[OHOS ERROR] </span><br><span class="line">[OHOS ERROR] Code:        2014</span><br><span class="line">[OHOS ERROR] </span><br><span class="line">[OHOS ERROR] Reason:      subsystem name config incorrect in &#x27;/home/openharmony/device/qemu/x86_64_virt/linux/ohos.build&#x27;, build file subsystem name is device_x86_64_virt,configured subsystem name is device_qemu-x86_64-linux.</span><br><span class="line">[OHOS ERROR] </span><br><span class="line">[OHOS ERROR] Error Type:  UNKNOWN ERROR TYPE</span><br><span class="line">[OHOS ERROR] </span><br><span class="line">[OHOS ERROR] Description: NO DESCRIPTION</span><br><span class="line">[OHOS ERROR] </span><br><span class="line">[OHOS ERROR] Solution:    UNKNOWN REASON</span><br><span class="line">[OHOS ERROR] </span><br></pre></td></tr></table></figure>
+<p>我的解决方案是修改build&#x2F;compile_standard_whitelist.json，将报错的device&#x2F;qemu&#x2F;x86_64_virt&#x2F;linux&#x2F;ohos.build加到bundle_subsystem_error白名单</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">         &quot;device/board/hisilicon/hispark_taurus/linux/ohos.build&quot;,</span><br><span class="line">         &quot;device/board/hisilicon/hispark_taurus/ohos.build&quot;,</span><br><span class="line">         &quot;device/qemu/arm_virt/linux/ohos.build&quot;,</span><br><span class="line">+        &quot;device/qemu/x86_64_virt/linux/ohos.build&quot;,</span><br><span class="line">         &quot;third_party/flutter/glfw/bundle.json&quot;,</span><br><span class="line">         &quot;vendor/hihope/rk3568/ohos.build&quot;,</span><br><span class="line">         &quot;vendor/hihope/ipcamera/ohos.build&quot;</span><br></pre></td></tr></table></figure>
+<h4 id="find-component-failed"><a href="#find-component-failed" class="headerlink" title="find component failed"></a>find component failed</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">[OHOS ERROR] Traceback (most recent call last):</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/containers/status.py&quot;, line 47, in wrapper</span><br><span class="line">[OHOS ERROR]     return func(*args, **kwargs)</span><br><span class="line">[OHOS ERROR]            ^^^^^^^^^^^^^^^^^^^^^</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/modules/ohos_build_module.py&quot;, line 65, in run</span><br><span class="line">[OHOS ERROR]     super().run()</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/modules/interface/build_module_interface.py&quot;, line 66, in run</span><br><span class="line">[OHOS ERROR]     self._load()</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/modules/ohos_build_module.py&quot;, line 83, in _load</span><br><span class="line">[OHOS ERROR]     self.loader.run()</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/services/interface/load_interface.py&quot;, line 50, in run</span><br><span class="line">[OHOS ERROR]     self.__post_init__()</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/services/loader.py&quot;, line 117, in __post_init__</span><br><span class="line">[OHOS ERROR]     self.parts_config_info = load_ohos_build.get_parts_info(</span><br><span class="line">[OHOS ERROR]                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/util/loader/load_ohos_build.py&quot;, line 947, in get_parts_info</span><br><span class="line">[OHOS ERROR]     _output_parts_info(parts_config_dict,</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/util/loader/load_ohos_build.py&quot;, line 765, in _output_parts_info</span><br><span class="line">[OHOS ERROR]     check_subsystem_and_component(parts_info_output_path, skip_partlist_check)</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/util/loader/load_ohos_build.py&quot;, line 696, in check_subsystem_and_component</span><br><span class="line">[OHOS ERROR]     compare_subsystem_and_component(subsystem_name, components_name, subsystem_compoents_whitelist_info,</span><br><span class="line">[OHOS ERROR]   File &quot;/home/openharmony/build/hb/util/loader/load_ohos_build.py&quot;, line 662, in compare_subsystem_and_component</span><br><span class="line">[OHOS ERROR]     raise Exception(message)</span><br><span class="line">[OHOS ERROR] Exception: find component device_qemu-x86_64-linux failed, please check it in /home/openharmony/out/preloader/qemu-x86_64-linux-min/parts.json.</span><br><span class="line">[OHOS ERROR] </span><br><span class="line">[OHOS ERROR] Code:        0000</span><br><span class="line">[OHOS ERROR] </span><br><span class="line">[OHOS ERROR] Reason:      find component device_qemu-x86_64-linux failed, please check it in /home/openharmony/out/preloader/qemu-x86_64-linux-min/parts.json.</span><br><span class="line">[OHOS ERROR] </span><br><span class="line">[OHOS ERROR] Error Type:  UNKNOWN ERROR TYPE</span><br><span class="line">[OHOS ERROR] </span><br><span class="line">[OHOS ERROR] Description: NO DESCRIPTION</span><br><span class="line">[OHOS ERROR] </span><br><span class="line">[OHOS ERROR] Solution:    NO SOLUTION</span><br><span class="line">[OHOS ERROR] </span><br></pre></td></tr></table></figure>
+<p>聪明的你应该能看到很明显报错的堆栈中看到了subsystem_compoents_whitelist_info，又是添加白名单，陆陆续续，有好几个白名单问题，以下是简要的报错Log：<br><code>Exception: find subsystem device_x86_64_virt failed, please check it in /home/openharmony/out/preloader/qemu-x86_64-linux-min/parts.json.</code><br><code>Exception: find component product_qemu-x86_64-linux-min failed, please check it in /home/openharmony/out/preloader/qemu-x86_64-linux-min/parts.json.</code><br>我的解决方案是，修改build&#x2F;compile_standard_whitelist.json，将找不到的device_qemu-x86_64-linux、device_x86_64_virt、product_qemu-x86_64-linux-min三个组件加到subsystem_components白名单.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">     ],</span><br><span class="line">-    &quot;subsystem_components&quot;: [],</span><br><span class="line">+    &quot;subsystem_components&quot;: [</span><br><span class="line">+        &quot;device_qemu-x86_64-linux&quot;,</span><br><span class="line">+        &quot;device_x86_64_virt&quot;,</span><br><span class="line">+        &quot;product_qemu-x86_64-linux-min&quot;</span><br><span class="line">+    ],</span><br><span class="line">     &quot;gn_part_or_subsystem_error&quot;: [</span><br></pre></td></tr></table></figure>
+<p>不是很理解，OpenHarmony作为一个开放的操作系统，每个device都需要额外加到白名单？</p>
+<p>你以为这就完了么，还有其他报错等着你呢!</p>
+<h4 id="Undefined-identifier-wifi-ffrt-enable"><a href="#Undefined-identifier-wifi-ffrt-enable" class="headerlink" title="Undefined identifier wifi_ffrt_enable"></a>Undefined identifier wifi_ffrt_enable</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ERROR at //foundation/communication/wifi/wifi/utils/BUILD.gn:100:9: Undefined identifier</span><br><span class="line">    if (wifi_ffrt_enable) &#123;</span><br><span class="line">        ^---------------</span><br><span class="line">See //foundation/communication/wifi/wifi/frameworks/native/BUILD.gn:295:7: which caused the file to be included.</span><br><span class="line">      &quot;$WIFI_ROOT_DIR/utils:wifi_utils&quot;,</span><br><span class="line">      ^--------------------------------</span><br></pre></td></tr></table></figure>
+<p>这个报错倒是不难，修改foundation&#x2F;communication&#x2F;wifi下的wifi&#x2F;wifi.gni文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">diff --git a/wifi/wifi.gni b/wifi/wifi.gni</span><br><span class="line">index 5cd865d..67ed62c 100644</span><br><span class="line">--- a/wifi/wifi.gni</span><br><span class="line">+++ b/wifi/wifi.gni</span><br><span class="line">@@ -31,6 +31,7 @@ declare_args() &#123;</span><br><span class="line">   wifi_feature_non_seperate_p2p = false</span><br><span class="line">   wifi_feature_non_hdf_driver = false</span><br><span class="line">   wifi_feature_with_local_random_mac = true</span><br><span class="line">+  wifi_ffrt_enable = false</span><br><span class="line">   if (defined(global_parts_info) &amp;&amp;</span><br><span class="line">       defined(global_parts_info.resourceschedule_efficiency_manager)) &#123;</span><br><span class="line">     wifi_feature_with_app_frozen = true</span><br></pre></td></tr></table></figure>
+<h4 id="内核编译报错"><a href="#内核编译报错" class="headerlink" title="内核编译报错"></a>内核编译报错</h4><p>FAILED: packages&#x2F;phone&#x2F;images&#x2F;bzImage</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">/tmp/wakemain-89feb8.s: Assembler messages:</span><br><span class="line">/tmp/wakemain-89feb8.s:4: Error: junk at end of line, first unrecognized character is `&quot;&#x27;</span><br><span class="line">/tmp/wakemain-89feb8.s:4: Error: file number less than one</span><br><span class="line">/tmp/wakemain-89feb8.s:5: Error: junk at end of line, first unrecognized character is `&quot;&#x27;</span><br><span class="line">/tmp/wakemain-89feb8.s:64: Error: junk at end of line, first unrecognized character is `&quot;&#x27;</span><br><span class="line">/tmp/wakemain-89feb8.s:282: Error: junk at end of line, first unrecognized character is `&quot;&#x27;</span><br><span class="line">/tmp/wakemain-89feb8.s:283: Error: junk at end of line, first unrecognized character is `&quot;&#x27;</span><br><span class="line">clang-15: error: assembler command failed with exit code 1 (use -v to see invocation)</span><br><span class="line">make[5]: *** [/home/openharmony/out/KERNEL_OBJ/kernel/src_tmp/linux-5.10/scripts/Makefile.build:294: arch/x86/realmode/rm/wakemain.o] Error 1</span><br><span class="line">make[5]: *** Waiting for unfinished jobs....</span><br><span class="line">/tmp/video-mode-908659.s: Assembler messages:</span><br><span class="line">/tmp/video-mode-908659.s:4: Error: junk at end of line, first unrecognized character is `&quot;&#x27;</span><br><span class="line">/tmp/video-mode-908659.s:4: Error: file number less than one</span><br><span class="line">/tmp/video-mode-908659.s:5: Error: junk at end of line, first unrecognized character is `&quot;&#x27;</span><br><span class="line">/tmp/video-mode-908659.s:6: Error: junk at end of line, first unrecognized character is `&quot;&#x27;</span><br><span class="line">/tmp/video-mode-908659.s:7: Error: junk at end of line, first unrecognized character is `&quot;&#x27;</span><br><span class="line">/tmp/video-mode-908659.s:554: Error: junk at end of line, first unrecognized character is `&quot;&#x27;</span><br><span class="line">/tmp/video-mode-908659.s:621: Error: junk at end of line, first unrecognized character is `&quot;&#x27;</span><br><span class="line">clang-15: error: assembler command failed with exit code 1 (use -v to see invocation)</span><br><span class="line">make[5]: *** [/home/openharmony/out/KERNEL_OBJ/kernel/src_tmp/linux-5.10/scripts/Makefile.build:294: arch/x86/realmode/rm/video-mode.o] Error 1</span><br><span class="line">make[4]: *** [/home/openharmony/out/KERNEL_OBJ/kernel/src_tmp/linux-5.10/arch/x86/realmode/Makefile:23: arch/x86/realmode/rm/realmode.bin] Error 2</span><br><span class="line">make[4]: *** Waiting for unfinished jobs....</span><br><span class="line">make[3]: *** [/home/openharmony/out/KERNEL_OBJ/kernel/src_tmp/linux-5.10/scripts/Makefile.build:537: arch/x86/realmode] Error 2</span><br><span class="line">make[3]: *** Waiting for unfinished jobs....</span><br><span class="line">make[2]: *** [/home/openharmony/out/KERNEL_OBJ/kernel/src_tmp/linux-5.10/Makefile:1850: arch/x86] Error 2</span><br><span class="line">make[2]: *** Waiting for unfinished jobs....</span><br><span class="line">make[2]: Leaving directory &#x27;/home/openharmony/out/KERNEL_OBJ/kernel/OBJ/linux-5.10&#x27;</span><br><span class="line">make[1]: *** [Makefile:192: __sub-make] Error 2</span><br><span class="line">make[1]: Leaving directory &#x27;/home/openharmony/out/KERNEL_OBJ/kernel/src_tmp/linux-5.10&#x27;</span><br><span class="line">make: *** [kernel.mk:90: /home/openharmony/out/KERNEL_OBJ/kernel/src_tmp/linux-5.10/arch/x86_64/boot/bzImage] Error 2</span><br></pre></td></tr></table></figure>
+<p>解决办法参考<a target="_blank" rel="noopener" href="https://gitee.com/openharmony/device_qemu/issues/IASWW3">issue</a><br>修改kernel&#x2F;linux&#x2F;build</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">diff --git a/kernel.mk b/kernel.mk</span><br><span class="line">index 5cbda86..f712c38 100644</span><br><span class="line">--- a/kernel.mk</span><br><span class="line">+++ b/kernel.mk</span><br><span class="line">@@ -49,6 +49,8 @@ else ifeq ($(KERNEL_ARCH), riscv64)</span><br><span class="line"> else ifeq ($(KERNEL_ARCH), x86_64)</span><br><span class="line">     KERNEL_TARGET_TOOLCHAIN := gcc</span><br><span class="line">     KERNEL_TARGET_TOOLCHAIN_PREFIX :=</span><br><span class="line">+    KERNEL_CROSS_COMPILE += LLVM=1</span><br><span class="line">+    KERNEL_CROSS_COMPILE += LLVM_IAS=1</span><br><span class="line"> endif</span><br><span class="line"> </span><br><span class="line"> ifeq ($(DEVICE_NAME), hispark_phoenix)</span><br></pre></td></tr></table></figure>
+<p>顺便，我们参考这个issue，修改一下foundation&#x2F;distributeddatamgr&#x2F;kv_store</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">diff --git a/kv_store.gni b/kv_store.gni</span><br><span class="line">index 53071fb..8f68798 100644</span><br><span class="line">--- a/kv_store.gni</span><br><span class="line">+++ b/kv_store.gni</span><br><span class="line">@@ -31,7 +31,7 @@ declare_args() &#123;</span><br><span class="line">     dms_service_enable = false</span><br><span class="line">   &#125;</span><br><span class="line"> </span><br><span class="line">-  if (product_name != &quot;qemu-arm-linux-min&quot;) &#123;</span><br><span class="line">+  if (device_company != &quot;qemu&quot;) &#123;</span><br><span class="line">     qemu_disable = true</span><br><span class="line">   &#125; else &#123;</span><br><span class="line">     qemu_disable = false</span><br></pre></td></tr></table></figure>
+
+<p>接下来的构建过程便很顺利了.</p>
+<h3 id="构建成功"><a href="#构建成功" class="headerlink" title="构建成功"></a>构建成功</h3><p><code>[OHOS INFO] qemu-x86_64-linux-min build success</code><br>镜像已经打包到对应的out目录</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ ls out/qemu-x86_64-linux/packages/phone/images</span><br><span class="line">bzImage         ramdisk.img  updater.img   vendor.img</span><br><span class="line">eng_system.img  system.img   userdata.img</span><br></pre></td></tr></table></figure>
+<p>按照qemu device的文档，执行脚本（需提前安装qemu-system-x86_64）即可运行构建好的镜像.<br><code>./vendor/ohemu/qemu_x86_64_linux_min/qemu_run.sh</code></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a target="_blank" rel="noopener" href="https://gitee.com/openharmony/docs/tree/master/zh-cn/device-dev">设备开发</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="wuxianlin 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="wuxianlin 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/openharmony/" rel="tag"># openharmony</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/02/10/android-gsi-and-gki/" rel="prev" title="GSI/GKI 与 Android 玩机">
+                  <i class="fa fa-angle-left"></i> GSI/GKI 与 Android 玩机
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC80MDkwMS8xNzQyNg=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2015 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">wuxianlin</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+</body>
+</html>

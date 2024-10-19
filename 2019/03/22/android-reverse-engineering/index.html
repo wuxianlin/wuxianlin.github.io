@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
 <meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
@@ -15,10 +15,10 @@
 
 
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha256-Z1K5uhUaJXA7Ll0XrZ/0JhX4lAtZFpT6jkKrEDT0drU=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"wuxianlin.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.14.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wuxianlin.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
     <meta name="description" content="当你拿到Android手机的卡刷包&#x2F;线刷包，你有没有想过解开它？当你眼前摆着一个APK&#x2F;jar&#x2F;so，你有没有想过反编译&#x2F;反汇编&#x2F;动态调试然后分析研究它？……">
 <meta property="og:type" content="article">
@@ -101,25 +101,25 @@
 
 
   <div class="search-pop-overlay">
-    <div class="popup search-popup"><div class="search-header">
-  <span class="search-icon">
-    <i class="fa fa-search"></i>
-  </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocapitalize="off" maxlength="80"
-           placeholder="搜索..." spellcheck="false"
-           type="search" class="search-input">
-  </div>
-  <span class="popup-btn-close" role="button">
-    <i class="fa fa-times-circle"></i>
-  </span>
-</div>
-<div class="search-result-container no-result">
-  <div class="search-result-icon">
-    <i class="fa fa-spinner fa-pulse fa-5x"></i>
-  </div>
-</div>
-
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -141,7 +141,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%B7%E6%9C%BA%E5%8C%85"><span class="nav-number">1.</span> <span class="nav-text">刷机包</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sparse-img-gt-ext4-img"><span class="nav-number">1.1.</span> <span class="nav-text">sparse img -&gt; ext4 img</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#super-img-gt-super-ext4-img-gt-system-product-vendor-ext4-img"><span class="nav-number">1.2.</span> <span class="nav-text">super img -&gt; super ext4 img -&gt; system product vendor ext4 img</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dat-gt-ext4-img"><span class="nav-number">1.3.</span> <span class="nav-text">dat -&gt; ext4 img</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#payload-dump"><span class="nav-number">1.4.</span> <span class="nav-text">payload dump</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#odex-x2F-oat-x2F-vdex"><span class="nav-number">2.</span> <span class="nav-text">odex&#x2F;oat&#x2F;vdex</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dex"><span class="nav-number">3.</span> <span class="nav-text">dex</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#dex%E8%BD%ACsmali"><span class="nav-number">3.1.</span> <span class="nav-text">dex转smali</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dex%E8%BD%ACjar-x2F-java"><span class="nav-number">3.2.</span> <span class="nav-text">dex转jar&#x2F;java</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%B7%E6%9C%BA%E5%8C%85"><span class="nav-number">1.</span> <span class="nav-text">刷机包</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sparse-img-ext4-img"><span class="nav-number">1.1.</span> <span class="nav-text">sparse img -&gt; ext4 img</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#super-img-super-ext4-img-system-product-vendor-ext4-img"><span class="nav-number">1.2.</span> <span class="nav-text">super img -&gt; super ext4 img -&gt; system product vendor ext4 img</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dat-ext4-img"><span class="nav-number">1.3.</span> <span class="nav-text">dat -&gt; ext4 img</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#payload-dump"><span class="nav-number">1.4.</span> <span class="nav-text">payload dump</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#odex-oat-vdex"><span class="nav-number">2.</span> <span class="nav-text">odex&#x2F;oat&#x2F;vdex</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dex"><span class="nav-number">3.</span> <span class="nav-text">dex</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#dex%E8%BD%ACsmali"><span class="nav-number">3.1.</span> <span class="nav-text">dex转smali</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dex%E8%BD%ACjar-java"><span class="nav-number">3.2.</span> <span class="nav-text">dex转jar&#x2F;java</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -154,18 +154,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -260,18 +260,17 @@
     
     
     
-    <div class="post-body" itemprop="articleBody">
-        <p>当你拿到Android手机的卡刷包&#x2F;线刷包，你有没有想过解开它？当你眼前摆着一个APK&#x2F;jar&#x2F;so，你有没有想过反编译&#x2F;反汇编&#x2F;动态调试然后分析研究它？……</p>
+    <div class="post-body" itemprop="articleBody"><p>当你拿到Android手机的卡刷包&#x2F;线刷包，你有没有想过解开它？当你眼前摆着一个APK&#x2F;jar&#x2F;so，你有没有想过反编译&#x2F;反汇编&#x2F;动态调试然后分析研究它？……</p>
 <span id="more"></span>
 
-<h3 id="刷机包"><a href="#刷机包" class="headerlink" title="刷机包"></a>刷机包</h3><h4 id="sparse-img-gt-ext4-img"><a href="#sparse-img-gt-ext4-img" class="headerlink" title="sparse img -&gt; ext4 img"></a>sparse img -&gt; ext4 img</h4><p>线刷包里面找到system.img&#x2F;vendor.img</p>
+<h3 id="刷机包"><a href="#刷机包" class="headerlink" title="刷机包"></a>刷机包</h3><h4 id="sparse-img-ext4-img"><a href="#sparse-img-ext4-img" class="headerlink" title="sparse img -&gt; ext4 img"></a>sparse img -&gt; ext4 img</h4><p>线刷包里面找到system.img&#x2F;vendor.img</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ file system.img</span><br><span class="line">system.img: Android sparse image, version: 1.0, Total of 849920 4096-byte output blocks in 2454 input chunks.</span><br></pre></td></tr></table></figure>
 <p>使用Android源码编译make simg2img得到out&#x2F;host&#x2F;linux-x86&#x2F;bin&#x2F;simg2img即可将Android的sparse image转为ext4的image</p>
-<h4 id="super-img-gt-super-ext4-img-gt-system-product-vendor-ext4-img"><a href="#super-img-gt-super-ext4-img-gt-system-product-vendor-ext4-img" class="headerlink" title="super img -&gt; super ext4 img -&gt; system product vendor ext4 img"></a>super img -&gt; super ext4 img -&gt; system product vendor ext4 img</h4><p>预装Android 10的机型一般使用<a target="_blank" rel="noopener" href="https://source.android.google.cn/devices/tech/ota/dynamic_partitions">动态分区</a><br>线刷包里面找到super.img<br>使用simg2img将super.img转为super_ext4.img<br>使用Android源码编译make lpunpack得到out&#x2F;host&#x2F;linux-x86&#x2F;bin&#x2F;lpunpack super_ext4.img super</p>
-<h4 id="dat-gt-ext4-img"><a href="#dat-gt-ext4-img" class="headerlink" title="dat -&gt; ext4 img"></a>dat -&gt; ext4 img</h4><p>卡刷包中的system.new.dat.br转system.new.dat<br>brotli –decompress system.new.dat.br –output&#x3D;system.new.dat</p>
+<h4 id="super-img-super-ext4-img-system-product-vendor-ext4-img"><a href="#super-img-super-ext4-img-system-product-vendor-ext4-img" class="headerlink" title="super img -&gt; super ext4 img -&gt; system product vendor ext4 img"></a>super img -&gt; super ext4 img -&gt; system product vendor ext4 img</h4><p>预装Android 10的机型一般使用<a target="_blank" rel="noopener" href="https://source.android.google.cn/devices/tech/ota/dynamic_partitions">动态分区</a><br>线刷包里面找到super.img<br>使用simg2img将super.img转为super_ext4.img<br>使用Android源码编译make lpunpack得到out&#x2F;host&#x2F;linux-x86&#x2F;bin&#x2F;lpunpack super_ext4.img super</p>
+<h4 id="dat-ext4-img"><a href="#dat-ext4-img" class="headerlink" title="dat -&gt; ext4 img"></a>dat -&gt; ext4 img</h4><p>卡刷包中的system.new.dat.br转system.new.dat<br>brotli –decompress system.new.dat.br –output&#x3D;system.new.dat</p>
 <p>卡刷包中的system.new.dat system.patch.dat system.transfer.list转ext4 img<br><a target="_blank" rel="noopener" href="https://github.com/xpirt/sdat2img">https://github.com/xpirt/sdat2img</a></p>
 <h4 id="payload-dump"><a href="#payload-dump" class="headerlink" title="payload dump"></a>payload dump</h4><p>AB分区卡刷包相关<br><a target="_blank" rel="noopener" href="https://github.com/cyxx/extract_android_ota_payload">https://github.com/cyxx/extract_android_ota_payload</a></p>
-<h3 id="odex-x2F-oat-x2F-vdex"><a href="#odex-x2F-oat-x2F-vdex" class="headerlink" title="odex&#x2F;oat&#x2F;vdex"></a>odex&#x2F;oat&#x2F;vdex</h3><p>Android &lt;&#x3D;4.4 odex to dex</p>
+<h3 id="odex-oat-vdex"><a href="#odex-oat-vdex" class="headerlink" title="odex&#x2F;oat&#x2F;vdex"></a>odex&#x2F;oat&#x2F;vdex</h3><p>Android &lt;&#x3D;4.4 odex to dex</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/JesusFreke/smali/wiki/DeodexInstructions">https://github.com/JesusFreke/smali/wiki/DeodexInstructions</a><br><a target="_blank" rel="noopener" href="https://bitbucket.org/JesusFreke/smali/downloads/">https://bitbucket.org/JesusFreke/smali/downloads/</a></p>
 <p>Android &lt;&#x3D;7 oat to dex</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/testwhat/SmaliEx/releases">https://github.com/testwhat/SmaliEx/releases</a><br><a target="_blank" rel="noopener" href="https://github.com/testwhat/SmaliEx">https://github.com/testwhat/SmaliEx</a><br><a target="_blank" rel="noopener" href="https://github.com/JesusFreke/smali/wiki/DeodexInstructions">https://github.com/JesusFreke/smali/wiki/DeodexInstructions</a><br><a target="_blank" rel="noopener" href="https://bitbucket.org/JesusFreke/smali/downloads/">https://bitbucket.org/JesusFreke/smali/downloads/</a></p>
@@ -283,7 +282,7 @@
 <p><a target="_blank" rel="noopener" href="https://github.com/iBotPeaches/Apktool">https://github.com/iBotPeaches/Apktool</a><br><a target="_blank" rel="noopener" href="https://ibotpeaches.github.io/Apktool/">https://ibotpeaches.github.io/Apktool/</a></p>
 <p>baksmali、smali 针对dex</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/JesusFreke/smali">https://github.com/JesusFreke/smali</a><br><a target="_blank" rel="noopener" href="https://bitbucket.org/JesusFreke/smali/downloads/">https://bitbucket.org/JesusFreke/smali/downloads/</a></p>
-<h4 id="dex转jar-x2F-java"><a href="#dex转jar-x2F-java" class="headerlink" title="dex转jar&#x2F;java"></a>dex转jar&#x2F;java</h4><p>googe enjarify工具dex转jar</p>
+<h4 id="dex转jar-java"><a href="#dex转jar-java" class="headerlink" title="dex转jar&#x2F;java"></a>dex转jar&#x2F;java</h4><p>googe enjarify工具dex转jar</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/google/enjarify">https://github.com/google/enjarify</a></p>
 <p>dex2jar</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/pxb1988/dex2jar">https://github.com/pxb1988/dex2jar</a><br><a target="_blank" rel="noopener" href="https://github.com/pxb1988/dex2jar/releases">https://github.com/pxb1988/dex2jar/releases</a></p>
@@ -299,7 +298,7 @@
 
     <footer class="post-footer">
           <div class="reward-container">
-  <div>Buy me a coffee</div>
+  <div>请我一杯咖啡吧！</div>
   <button>
     赞赏
   </button>
@@ -326,12 +325,12 @@
           <div class="post-nav">
             <div class="post-nav-item">
                 <a href="/2018/11/08/oppo-r17pro-root/" rel="prev" title="OPPO R17 Pro 解锁 BootLoader & root">
-                  <i class="fa fa-chevron-left"></i> OPPO R17 Pro 解锁 BootLoader & root
+                  <i class="fa fa-angle-left"></i> OPPO R17 Pro 解锁 BootLoader & root
                 </a>
             </div>
             <div class="post-nav-item">
                 <a href="/2023/02/10/android-gsi-and-gki/" rel="next" title="GSI/GKI 与 Android 玩机">
-                  GSI/GKI 与 Android 玩机 <i class="fa fa-chevron-right"></i>
+                  GSI/GKI 与 Android 玩机 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
           </div>
@@ -351,15 +350,14 @@
   <footer class="footer">
     <div class="footer-inner">
 
-
-<div class="copyright">
-  &copy; 2015 – 
-  <span itemprop="copyrightYear">2023</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">wuxianlin</span>
-</div>
+  <div class="copyright">
+    &copy; 2015 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">wuxianlin</span>
+  </div>
 <div class="busuanzi-count">
     <span class="post-meta-item" id="busuanzi_container_site_uv">
       <span class="post-meta-item-icon">
@@ -385,6 +383,12 @@
   </footer>
 
   
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
   <div class="back-to-top" role="button" aria-label="返回顶部">
     <i class="fa fa-arrow-up fa-lg"></i>
     <span>0%</span>
@@ -397,10 +401,12 @@
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
-<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
 <script src="/js/third-party/search/local-search.js"></script>
+
+
 
 
 

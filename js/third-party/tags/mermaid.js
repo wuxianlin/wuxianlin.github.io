@@ -1,23 +1,23 @@
 /* global NexT, CONFIG, mermaid */
 
 document.addEventListener('page:loaded', () => {
-  const mermaidElements = document.querySelectorAll('.mermaid');
+  const mermaidElements = document.querySelectorAll('pre > .mermaid');
   if (mermaidElements.length) {
     NexT.utils.getScript(CONFIG.mermaid.js, {
       condition: window.mermaid
     }).then(() => {
       mermaidElements.forEach(element => {
+        const box = document.createElement('div');
+        box.className = 'code-container';
         const newElement = document.createElement('div');
         newElement.innerHTML = element.innerHTML;
-        newElement.className = element.className;
-        const parent = element.parentNode;
-        // Fix issue #347
-        // Support mermaid inside backtick code block
-        if (parent.matches('pre')) {
-          parent.parentNode.replaceChild(newElement, parent);
-        } else {
-          parent.replaceChild(newElement, element);
+        newElement.className = 'mermaid';
+        box.appendChild(newElement);
+        if (CONFIG.copycode.enable) {
+          NexT.utils.registerCopyButton(box, box, element.textContent);
         }
+        const parent = element.parentNode;
+        parent.parentNode.replaceChild(box, parent);
       });
       mermaid.initialize({
         theme    : CONFIG.darkmode && window.matchMedia('(prefers-color-scheme: dark)').matches ? CONFIG.mermaid.theme.dark : CONFIG.mermaid.theme.light,
@@ -26,7 +26,7 @@ document.addEventListener('page:loaded', () => {
         gantt    : { axisFormat: '%m/%d/%Y' },
         sequence : { actorMargin: 50 }
       });
-      mermaid.init();
+      mermaid.run();
     });
   }
 });
