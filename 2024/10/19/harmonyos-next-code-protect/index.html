@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wuxianlin.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="HarmonyOS Next支持应用加密，本文尝试分析其安全实现.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HarmonyOS Next 应用加密 安全性分析">
+<meta property="og:url" content="https://wuxianlin.com/2024/10/19/harmonyos-next-code-protect/index.html">
+<meta property="og:site_name" content="wuxianlin">
+<meta property="og:description" content="HarmonyOS Next支持应用加密，本文尝试分析其安全实现.">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://wuxianlin.com/2024/10/19/harmonyos-next-code-protect/code-protect.png">
+<meta property="og:image" content="https://wuxianlin.com/2024/10/19/harmonyos-next-code-protect/store_utils.png">
+<meta property="og:image" content="https://wuxianlin.com/2024/10/19/harmonyos-next-code-protect/keynegotiation_task_1.png">
+<meta property="og:image" content="https://wuxianlin.com/2024/10/19/harmonyos-next-code-protect/keynegotiation_task_2.png">
+<meta property="og:image" content="https://wuxianlin.com/2024/10/19/harmonyos-next-code-protect/negotiation_proxy_1.png">
+<meta property="og:image" content="https://wuxianlin.com/2024/10/19/harmonyos-next-code-protect/negotiation_proxy_2.png">
+<meta property="article:published_time" content="2024-10-19T11:00:00.000Z">
+<meta property="article:modified_time" content="2024-10-19T11:00:00.000Z">
+<meta property="article:author" content="wuxianlin">
+<meta property="article:tag" content="harmonyos">
+<meta property="article:tag" content="code-protect">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wuxianlin.com/2024/10/19/harmonyos-next-code-protect/code-protect.png">
+
+
+<link rel="canonical" href="https://wuxianlin.com/2024/10/19/harmonyos-next-code-protect/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://wuxianlin.com/2024/10/19/harmonyos-next-code-protect/","path":"2024/10/19/harmonyos-next-code-protect/","title":"HarmonyOS Next 应用加密 安全性分析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>HarmonyOS Next 应用加密 安全性分析 | wuxianlin</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">wuxianlin</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-links"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>链接</a></li><li class="menu-item menu-item-android"><a href="/android/" rel="section"><i class="fa fa-mobile fa-fw"></i>玩机</a></li><li class="menu-item menu-item-tv"><a href="/tv/" rel="section"><i class="fa fa-tv fa-fw"></i>电视</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Android-%E5%8A%A0%E5%9B%BA%E5%9B%9E%E9%A1%BE"><span class="nav-number">1.</span> <span class="nav-text">Android 加固回顾</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HarmonyOS-Next-%E5%BA%94%E7%94%A8%E5%8A%A0%E5%AF%86"><span class="nav-number">2.</span> <span class="nav-text">HarmonyOS Next 应用加密</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%98%E7%BD%91%E8%B5%84%E6%96%99"><span class="nav-number">2.1.</span> <span class="nav-text">官网资料</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%AA%E4%BA%BA%E7%90%86%E8%A7%A3"><span class="nav-number">2.2.</span> <span class="nav-text">个人理解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E5%9B%BA%E4%BB%B6"><span class="nav-number">3.1.</span> <span class="nav-text">获取固件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%93%E5%8C%85"><span class="nav-number">3.2.</span> <span class="nav-text">抓包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%86%E5%90%91%E5%88%86%E6%9E%90%E5%BA%94%E7%94%A8%E5%95%86%E5%BA%97"><span class="nav-number">3.3.</span> <span class="nav-text">逆向分析应用商店</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-number">4.</span> <span class="nav-text">其他</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">wuxianlin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wuxianlin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wuxianlin" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wuxianlinwxl@gmail.com" title="E-Mail → mailto:wuxianlinwxl@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/wuxianlin000000" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;wuxianlin000000" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wuxianlin.com/2024/10/19/harmonyos-next-code-protect/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="wuxianlin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wuxianlin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="HarmonyOS Next 应用加密 安全性分析 | wuxianlin">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HarmonyOS Next 应用加密 安全性分析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-10-19 19:00:00" itemprop="dateCreated datePublished" datetime="2024-10-19T19:00:00+08:00">2024-10-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/HarmonyOS/" itemprop="url" rel="index"><span itemprop="name">HarmonyOS</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>HarmonyOS Next支持应用加密，本文尝试分析其安全实现. </p>
+<span id="more"></span>
+
+<h2 id="Android-加固回顾"><a href="#Android-加固回顾" class="headerlink" title="Android 加固回顾"></a>Android 加固回顾</h2><p>在我们熟悉的Android生态中，APK较容易被逆向分析，查看反编译代码. 不少应用为了所谓的“安全性”，通常采用加固&#x2F;加壳手段，尝试保护自己的代码“不被人看到”.<br>实际上，客户端程序运行在终端，一定会释放到内存中，而且APK基本不挑设备，什么模拟器、root的设备都可以运行，所以我们看到脱壳方案层出不穷，加固厂商也在不断提升加固手段，运行环境安全性检测，一代二代三代壳、VMP、Java2C，各种新的加固技术也在不断迭代.<br>也就是说，应用程序如果将自己的安全性，完全寄托在这层壳上，将是巨大的安全隐患，因为这层壳一旦被脱掉，程序将被一览无遗，，，这层壳，不过就是皇帝的新衣罢了. 而且，加固可能对应用带来崩溃、兼容性、性能等负面影响. 对于安全要求较高、纵深防御的应用来说，首先要假设的，便是客户端代码、算法完全暴露在攻击者面前，然后通过安全方案设计，提升应用安全性.<br>不过话又说回来，加固确实能提升应用程序的逆向难度，挡住不少刚入门的新手，所以，这个猫鼠游戏，还在不断进行. </p>
+<h2 id="HarmonyOS-Next-应用加密"><a href="#HarmonyOS-Next-应用加密" class="headerlink" title="HarmonyOS Next 应用加密"></a>HarmonyOS Next 应用加密</h2><h3 id="官网资料"><a href="#官网资料" class="headerlink" title="官网资料"></a>官网资料</h3><p>我们从华为开发者官网，可以看到<a target="_blank" rel="noopener" href="https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/code-protect-V5">应用加密</a>章节.<br>为了保护应用代码安全，保护开发者的核心资产，HarmonyOS提供了<strong>端到端</strong>的应用代码保护机制，该机制以系统安全为基础，构建内核级应用生命周期内的代码安全保护能力.<br><img src="/2024/10/19/harmonyos-next-code-protect/code-protect.png" alt="应用加密"></p>
+<blockquote>
+<p>开发者向应用市场提交上架申请，上传应用包后可选择是否加密.<br>选择加密的应用，在经过应用市场审核后，应用市场会对上架应用做代码加密.<br>应用在设备上安装时，安装文件落盘后仍是处于加密状态，有效的保护应用程序；<br>当应用程序启动时，通过内核加载的应用文件是加密状态，因此这些文件会在内核中按需解密执行.</p>
+<p>应用加密采用标准AES加密算法，解密后的明文只存在于内存中，不会存储到设备，形成端到端的加密方案，有效的保障应用程序的安全性.</p>
+<p>系统级应用加密具有如下优点：</p>
+<ul>
+<li>应用端到端加密，应用启动后在内核内按需解密执行.</li>
+<li>系统级的解密优化，相对于传统加壳等加固方式对性能的影响更小.</li>
+<li>解密密钥经过安全传输后存储在系统TEE环境中，更加安全.</li>
+</ul>
+<p>加密效果：<br>加密对象为应用内编译后的代码文件，覆盖.abc文件，加密前的代码文件可被反编译，加密后的代码文件不可被分析，保障应用代码防逆向分析、防破解.</p>
+</blockquote>
+<h3 id="个人理解"><a href="#个人理解" class="headerlink" title="个人理解"></a>个人理解</h3><p>总结下来，华为为应用提供了一套系统级的加固方案:</p>
+<ul>
+<li>应用可选加密.</li>
+<li>覆盖.abc文件（JS&#x2F;TS&#x2F;ArkTS代码，通过方舟编译器，编译为方舟字节码，存放在abc格式的文件中；类比Android apk的Java&#x2F;Kotlin代码——&gt;dalvik字节码——&gt;dex文件）.</li>
+<li>加密算法AES. </li>
+<li>下载、落盘的abc文件是密文.</li>
+<li>解密密钥经过安全传输，存储在TEE安全环境.</li>
+<li>解密过程发生在内核(指鸿蒙&#x2F;Linux内核?还是指代方舟运行时?).</li>
+<li>abc明文只存在内存中.</li>
+</ul>
+<p>我们可以理解为，这套方案的安全性，依赖于系统的安全性（提权可dump内存、CA可被调用）、TEE环境的安全性（存储明文密钥）.<br>由于解密能力并没有开源到OpenHarmony，目前也没有非华为设备运行HarmonyOS Next（OpenHarmony+HMS），而且华为新的设备并没有开放解锁BootLoader，因此在当前HarmonyOS Next发布初期这个节点，对应用加密逻辑的分析难度直接buff叠满.<br>而且，我个人认为，这套方案，极其依赖HarmonyOS Next的生态的封闭性：</p>
+<ul>
+<li>商店上架的加密应用，将和商店绑定，密钥需通过HarmonyOS Next应用商店与HarmonyOS Next的TEE环境端到端安全传输，OpenHarmony并没有开源相应能力，因此无法侧载到OpenHarmony;</li>
+<li>应用如果上架到其他无加密的应用商店、或者在官网提供OpenHarmony安装包，那么HarmonyOS Next应用商店的加密将被绕过;</li>
+<li>希望共享HarmonyOS Next应用生态的厂商，需接入封闭的HMS、并实现与华为终端相同的TEE、加密内核等能力.</li>
+</ul>
+<p>同AOSP&amp;GMS类似，接入GMS的应用无法在AOSP运行，AOSP的应用可以在GMS设备运行.<br>OpenHarmony的生态共享，也是单向的，OpenHarmony的应用，可以通过开发者签名侧载到HarmonyOS Next的设备（或上架商店安装），而接入HMS的应用、接入应用商店加密的应用，无法在OpenHarmony运行.</p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><h3 id="获取固件"><a href="#获取固件" class="headerlink" title="获取固件"></a>获取固件</h3><p>我们通过抓包，不难获取到HarmonyOS Next的固件包，其中主要分析update_full_base.zip这个包.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Mate60 NEXT.0.0.71 beta1</span><br><span class="line">https://update.dbankcdn.com/download/data/pub_13/HWHOTA_hota_900_9/24/v3/fThYWevRQueNuU8HO4XqWw/full/filelist.xml</span><br><span class="line">https://update.dbankcdn.com/download/data/pub_13/HWHOTA_hota_900_9/24/v3/fThYWevRQueNuU8HO4XqWw/full/update_full_base.zip</span><br><span class="line"></span><br><span class="line">https://update.dbankcdn.com/download/data/pub_13/HWHOTA_hota_900_9/2d/v3/yFXbndBIQkCMcFJhLHlkXQ/full/filelist.xml</span><br><span class="line">https://update.dbankcdn.com/download/data/pub_13/HWHOTA_hota_900_9/2d/v3/yFXbndBIQkCMcFJhLHlkXQ/full/update_full_cust_BRA-AL00_all_cn.zip</span><br><span class="line"></span><br><span class="line">https://update.dbankcdn.com/download/data/pub_13/HWHOTA_hota_900_9/9a/v3/WsDTBim-Ru2ZxOcdTPJtyw/full/filelist.xml</span><br><span class="line">https://update.dbankcdn.com/download/data/pub_13/HWHOTA_hota_900_9/9a/v3/WsDTBim-Ru2ZxOcdTPJtyw/full/update_full_preload_BRA-AL00_all_cn_R8.zip</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://weibo.com/3322982490/Ou6P6D4hC">解包方法</a>也不难.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">//下载解包工具</span><br><span class="line">$ git clone https://gitee.com/openharmony/update_packaging_tools.git</span><br><span class="line">$ cd update_packaging_tools</span><br><span class="line">//解压下载到的zip包，update.bin文件将被解压到update_full_base目录</span><br><span class="line">$ unzip update_full_base.zip -d update_full_base</span><br><span class="line">//创建输出目录</span><br><span class="line">$ mkdir out</span><br><span class="line">//python3 venv环境，个人习惯，安装依赖包</span><br><span class="line">$ python3 -m venv venv</span><br><span class="line">$ source venv/bin/activate</span><br><span class="line">$ pip3 install xmltodict cryptography asn1crypto</span><br><span class="line">//执行解包，解包完成后，out/unpack_result_xxxxxx目录下能看到boot.img、system.img等镜像</span><br><span class="line">$ python3 build_update.py out update_full_base -unpack update.bin</span><br><span class="line">$ deactivate</span><br></pre></td></tr></table></figure>
+<p>我们通过mount命令，便能看到system中的内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">//创建system目录，用于挂载</span><br><span class="line">$ mkdir system</span><br><span class="line">//挂载</span><br><span class="line">$ sudo mount -o ro,loop system.img system</span><br><span class="line">//可以看到我们要分析的应用商店目录存在多个hsp、hap</span><br><span class="line">$ ls system/system/app/AppGallery</span><br><span class="line">BackgroundTaskFramework.hsp  entry.hap             testDistributionLib.hsp</span><br><span class="line">businesslib.hsp              GlobalConfig.hsp      uiextension.hap</span><br><span class="line">commonlib.hsp                OperationManager.hsp  uilib.hsp</span><br><span class="line">DownloadInstall.hsp          ServerRequestKit.hsp</span><br><span class="line">enterpriseapp.hap            service.hap</span><br><span class="line">//拷贝完成你需要的文件，然后就可以卸载system了</span><br><span class="line">$ sudo umount system</span><br></pre></td></tr></table></figure>
+<h3 id="抓包"><a href="#抓包" class="headerlink" title="抓包"></a>抓包</h3><p>我们通过对应用商店抓包，了解到一些很有意思的信息（已移除部分无用信息）：<br>按照通常理解，应用有包名、版本号等信息，而在应用商店，应用还有一个很关键的信息，叫做appoid.<br>从fetchHarmonyFiles获取下载地址的接口<code> https://store-drcn.hispace.dbankcloud.cn/hwmarket/harmony/client?method=client.fetchHarmonyFiles&amp;ts=</code>，可以拿到如下响应:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;rtnCode&quot;: 0,</span><br><span class="line">  &quot;rtnDesc&quot;: &quot;success&quot;,</span><br><span class="line">  &quot;harmonyApps&quot;: [</span><br><span class="line">    &#123;</span><br><span class="line">      &quot;pkgName&quot;: &quot;com.tencent.wechat&quot;,</span><br><span class="line">      &quot;origionSha256&quot;: &quot;38c5d1e0731b82d9cbf641fd3d82b9470b5b4494113386be9066b54f1a3200bb&quot;,</span><br><span class="line">      &quot;versionCode&quot;: 1048614,</span><br><span class="line">      &quot;hapFiles&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">          &quot;filePath&quot;: &quot;&quot;,</span><br><span class="line">          &quot;packageUrl&quot;: &quot;&quot;,</span><br><span class="line">          &quot;sha256&quot;: &quot;4d960828e8da0921d8936a99e163ecdd27f41dd8669baaced840662dbbcac879&quot;,</span><br><span class="line">          &quot;fileSize&quot;: 330579568,</span><br><span class="line">          &quot;hapId&quot;: &quot;193372d2887346b7907dd80d00a62b1d&quot;,</span><br><span class="line">          &quot;fileType&quot;: 4,</span><br><span class="line">          &quot;versionCode&quot;: 1048614,</span><br><span class="line">          &quot;pkg&quot;: &quot;com.tencent.wechat&quot;,</span><br><span class="line">          &quot;featureName&quot;: &quot;entry&quot;,</span><br><span class="line">          &quot;appId&quot;: &quot;C5765880207854244859&quot;,</span><br><span class="line">          &quot;moduleType&quot;: &quot;entry&quot;</span><br><span class="line">        &#125;</span><br><span class="line">      ],</span><br><span class="line">      &quot;appoid&quot;: &quot;1e2b570768404e26be3cf5ff754db454&quot;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个appoid将参与很重要的两个网络请求：<br>getCloudChallenge<br><code>https://store-drcn.hispace.dbankcloud.cn/hwmarket/harmony/client?method=client.getCloudChallenge&amp;ts=</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;ver&quot;: &quot;1.1&quot;,</span><br><span class="line">  &quot;scene&quot;: 0,</span><br><span class="line">  &quot;apps&quot;: &quot;[&#123;\&quot;bundleName\&quot;:\&quot;com.tencent.wechat\&quot;,\&quot;versionCode\&quot;:1048614,\&quot;appoid\&quot;:\&quot;1e2b570768404e26be3cf5ff754db454\&quot;,\&quot;originSha256\&quot;:\&quot;38c5d1e0731b82d9cbf641fd3d82b9470b5b4494113386be9066b54f1a3200bb\&quot;&#125;]&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>拿到成功的响应，会携带cloudChallenge</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;rtnCode&quot;: 0,</span><br><span class="line">  &quot;rtnDesc&quot;: &quot;success&quot;,</span><br><span class="line">  &quot;cloudChallenges&quot;: [</span><br><span class="line">    &#123;</span><br><span class="line">      &quot;bundleName&quot;: &quot;com.tencent.wechat&quot;,</span><br><span class="line">      &quot;cloudChallenge&quot;: &quot;0123456789ABCDEF0123456789ABCDEF&quot;,</span><br><span class="line">      &quot;type&quot;: 0</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>紧接着的getNegotiationKey请求，就更有意思了，携带了上一个请求拿到的cloudChallenge，来自服务端的挑战，以及设备公钥，设备证书链，签名：<br><code>https://store-drcn.hispace.dbankcloud.cn/hwmarket/harmony/client?method=client.getNegotiationKey&amp;ts=</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;ver&quot;: &quot;1.1&quot;,</span><br><span class="line">  &quot;scene&quot;: 0,</span><br><span class="line">  &quot;apps&quot;: &quot;[&#123;\&quot;bundleName\&quot;:\&quot;com.tencent.wechat\&quot;,\&quot;versionCode\&quot;:1048614,\&quot;appoid\&quot;:\&quot;1e2b570768404e26be3cf5ff754db454\&quot;,\&quot;cloudChallenge\&quot;:\&quot;0123456789ABCDEF0123456789ABCDEF\&quot;,\&quot;devicePubKey\&quot;:\&quot;==\&quot;,\&quot;signature\&quot;:\&quot;\&quot;&#125;]&quot;,</span><br><span class="line">  &quot;deviceCertChain&quot;: &quot;[\&quot;-----BEGIN CERTIFICATE-----\\n=\\n-----END CERTIFICATE-----\&quot;,\&quot;-----BEGIN CERTIFICATE-----\\n==\\n-----END CERTIFICATE-----\&quot;,\&quot;-----BEGIN CERTIFICATE-----\\n=\\n-----END CERTIFICATE-----\&quot;,\&quot;-----BEGIN CERTIFICATE-----\\n==\\n-----END CERTIFICATE-----\&quot;]&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这是在干什么呢？通常来说，这是服务端在挑战客户端，发起客户端的设备证明，要求客户端证明自己的合法性，才会吐一些敏感数据回客户端. 经过服务端的一系列验证，拿到如下响应:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;rtnCode&quot;: 0,</span><br><span class="line">  &quot;rtnDesc&quot;: &quot;SUCCESS&quot;,</span><br><span class="line">  &quot;appSecretMetaList&quot;: [</span><br><span class="line">    &#123;</span><br><span class="line">      &quot;bundleName&quot;: &quot;com.tencent.wechat&quot;,</span><br><span class="line">      &quot;versionCode&quot;: 1048614,</span><br><span class="line">      &quot;secretMetaInfo&quot;: &#123;</span><br><span class="line">        &quot;ver&quot;: 1,</span><br><span class="line">        &quot;encMessage&quot;: &quot;==&quot;,</span><br><span class="line">        &quot;cloudPubKey&quot;: &quot;==&quot;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的appSecretMetaList、secretMetaInfo，不难猜测，这个信息是应用核心的秘密信息，而cloudPubKey，顾名思义，是服务端的公钥，那encMessage呢，自然而然，则是服务端传给客户端的核心加密数据. 根据我的猜测，可能有着服务端的签名（通过cloudPubKey验签，防篡改），以及与设备公钥关联的安全协议的加密.</p>
+<p>而上述用法，实际上就是华为设备证书的设备真实性证明的标准用法，参考<a target="_blank" rel="noopener" href="https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/device-attestation-intro-V5">设备真实性证明能力简介</a>.</p>
+<h3 id="逆向分析应用商店"><a href="#逆向分析应用商店" class="headerlink" title="逆向分析应用商店"></a>逆向分析应用商店</h3><p>目前网络上逆向abc（方舟字节码）的工具都还不太成熟，我找到了<a target="_blank" rel="noopener" href="https://github.com/Yricky/abcde">abcde</a>和基于JADX的<a target="_blank" rel="noopener" href="https://github.com/ohos-decompiler/abc-decompiler">abc-decompiler</a>.<br>由于比较熟悉jadx，所以使用abc-decompiler尝试反编译应用商店.  </p>
+<p>我们解压system&#x2F;app&#x2F;AppGallery&#x2F;businesslib.hsp，拿到ets&#x2F;modules.abc，拖到abc-decompiler工具中：<br>我们跟踪上面的两个请求，发现相关代码：<br>com.huawei.hmsapp.appgallery.businesslib.ets.utils.DownloadManager.keynegotiation.server.utils.StoreUtils<br><img src="/2024/10/19/harmonyos-next-code-protect/store_utils.png" alt="StoreUtils"><br>com.huawei.hmsapp.appgallery.businesslib.ets.utils.DownloadManager.keynegotiation.tasks.keyNegotiationTask<br><img src="/2024/10/19/harmonyos-next-code-protect/keynegotiation_task_1.png" alt="keyNegotiationTask"><br><img src="/2024/10/19/harmonyos-next-code-protect/keynegotiation_task_2.png" alt="keyNegotiationTask"><br>这里会调进NegotiationProxy<br>com.huawei.hmsapp.appgallery.businesslib.ets.utils.DownloadManager.keynegotiation.proxy.NegotiationProxy<br><img src="/2024/10/19/harmonyos-next-code-protect/negotiation_proxy_1.png" alt="NegotiationProxy"><br><img src="/2024/10/19/harmonyos-next-code-protect/negotiation_proxy_2.png" alt="NegotiationProxy"><br>NegotiationProxy这里面很明显是Binder进程间通信，获取”@hms:security.codeProtect”系统服务，调用对应的接口.</p>
+<p>难怪，这个security.codeProtect服务属于HMS，不属于OpenHarmony. 这个服务的实现位于</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">//服务实现</span><br><span class="line">/system/lib64/module/hms/security/libcodeprotect_napi.z.so</span><br><span class="line">//服务的init文件，类似于Android中的init.xxx.rc</span><br><span class="line">/system/etc/init/code_protect.cfg</span><br><span class="line">//服务的属性配置文件，类似于Android中的build.prop</span><br><span class="line">/system/etc/param/code_protect.para</span><br><span class="line">//system ability配置</span><br><span class="line">/system/profile/code_protect.json</span><br><span class="line">//相关API、SDK封装的Manager</span><br><span class="line">/system/lib64/libcode_protect_mgr.z.so</span><br><span class="line">/system/lib64/libcode_protect_mgr_sdk.z.so</span><br><span class="line">//所谓CA，是与TEE中运行的TA对应的，CA在HarmonyOS侧，与TEE环境的对应TA通信</span><br><span class="line">/system/lib64/libcode_protect_ca.z.so</span><br></pre></td></tr></table></figure>
+
+<p>从上面的分析来看，基本符合华为开发者官网的表述.<br>整个密钥的下载过程，用到基于设备证书的设备真实性证明，提供基础的设备安全性保障.<br>从服务端与APP通信，APP调用hms的security.codeProtect的API，通过binder Proxy，调用到codeprotect的service，再到codeprotect的ca，codeprotect的ta，由此，服务端与TEE建立端到端的安全通信链路.</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>本文通过常规的技术手段对HarmonyOS进行安全性分析，仅为纯技术探讨，目前的分析也无实质性进展，如果有侵犯您的权益，请联系删除.<br>希望上面的内容能帮助感兴趣的同学，并且可以开展进一步的安全性分析，欢迎一起进行安全技术探讨.  </p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="wuxianlin 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="wuxianlin 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/harmonyos/" rel="tag"># harmonyos</a>
+              <a href="/tags/code-protect/" rel="tag"># code-protect</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/10/19/openharmony5-qemu-build/" rel="prev" title="OpenHarmony 5.0 qemu 编译记录">
+                  <i class="fa fa-angle-left"></i> OpenHarmony 5.0 qemu 编译记录
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC80MDkwMS8xNzQyNg=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2015 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">wuxianlin</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+</body>
+</html>
