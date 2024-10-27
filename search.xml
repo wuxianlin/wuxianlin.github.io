@@ -378,4 +378,59 @@
         <tag>R17Pro</tag>
       </tags>
   </entry>
+  <entry>
+    <title>HarmonyOS Next 模拟器 root</title>
+    <url>/2024/10/27/root-harmonyos-next-emultor/</url>
+    <content><![CDATA[<p>HarmonyOS Next(Based on OpenHarmony)公测了，微信、QQ也都适配了，我们尝试修改HarmonyOS Next模拟器，获取root权限.</p>
+<span id="more"></span>
+
+<h2 id="Android-adb-root权限回顾"><a href="#Android-adb-root权限回顾" class="headerlink" title="Android adb root权限回顾"></a>Android adb root权限回顾</h2><p>玩过Android adb root的同学，可能对如何获取adb root并不陌生，一般而言，构建userdebug、eng版本，便能直接通过adb root，获取root权限.<br>至于user版本，想要变成adb root版本，则需要修改：</p>
+<ul>
+<li>修改default.prop&#x2F;prop.default&#x2F;build.prop等prop文件，将ro.debuggable由0改为1，可能也需要将ro.secure和ro.adb.secure由1改为0;</li>
+<li>编译userdebug版本的sepolicy，替换（增加编译su.te）.</li>
+<li>可能需要编译userdebug版本的adbd，替换掉adbd;</li>
+</ul>
+<p>之前尝试基于Magisk来作相关修改，测试能成功获取adb root权限，<a href="https://github.com/wuxianlin/adb_root">adb root Magisk 模块</a>.<br>（待补充更多技术细节介绍……）</p>
+<h2 id="获取HarmonyOS-Next模拟器的hdc-root权限"><a href="#获取HarmonyOS-Next模拟器的hdc-root权限" class="headerlink" title="获取HarmonyOS Next模拟器的hdc root权限"></a>获取HarmonyOS Next模拟器的hdc root权限</h2><h3 id="获取模拟器镜像"><a href="#获取模拟器镜像" class="headerlink" title="获取模拟器镜像"></a>获取模拟器镜像</h3><p>从官网下载IDE：<a href="https://developer.huawei.com/consumer/cn/download/deveco-studio">DevEco Studio</a>，安装后，在IDE的界面下载模拟器镜像，按照<a href="https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/ide-emulator-faqs-V5#section172728114485">QA</a>解决相关问题，即可启动模拟器镜像.</p>
+<p>模拟器镜像位于%LOCALAPPDATA%\Huawei\Sdk\system-image</p>
+<h3 id="开始修改"><a href="#开始修改" class="headerlink" title="开始修改"></a>开始修改</h3><p>参考Android的adb root的修改方案，我们来修改HarmonyOS Next的模拟器的system.img.</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">//创建临时目录，用于挂载</span><br><span class="line">mkdir system</span><br><span class="line">//挂载为读写</span><br><span class="line">sudo mount -o rw,loop system.img system</span><br><span class="line">//进行各种修改，举例修改system/etc/param/ohos.para</span><br><span class="line">sudo sed -i &#x27;s/const.secure=1/const.secure=0/g&#x27; system/system/etc/param/ohos.para</span><br><span class="line">sudo sed -i &#x27;s/const.debuggable=0/const.debuggable=1/g&#x27; system/system/etc/param/ohos.para</span><br><span class="line">//修改完后，卸载</span><br><span class="line">sudo umount system</span><br></pre></td></tr></table></figure>
+<p>针对5.0.0.71（Beta1）版本的system.img，我修改了如下内容：</p>
+<h4 id="system-etc-param-ohos-para"><a href="#system-etc-param-ohos-para" class="headerlink" title="&#x2F;system&#x2F;etc&#x2F;param&#x2F;ohos.para"></a>&#x2F;system&#x2F;etc&#x2F;param&#x2F;ohos.para</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">//修改前</span><br><span class="line">const.secure=1</span><br><span class="line">const.debuggable=0</span><br><span class="line">//修改后</span><br><span class="line">const.secure=0</span><br><span class="line">const.debuggable=1</span><br></pre></td></tr></table></figure>
+<h4 id="system-etc-param-hdc-para"><a href="#system-etc-param-hdc-para" class="headerlink" title="&#x2F;system&#x2F;etc&#x2F;param&#x2F;hdc.para"></a>&#x2F;system&#x2F;etc&#x2F;param&#x2F;hdc.para</h4><p>我们参考OpenHarmony的代码，直接替换：<a href="https://gitee.com/openharmony/developtools_hdc/blob/OpenHarmony-5.0.1-Release/src/daemon/etc/hdc.para">修改前developtools&#x2F;hdc&#x2F;src&#x2F;daemon&#x2F;etc&#x2F;hdc.para</a>、<a href="https://gitee.com/openharmony/developtools_hdc/blob/OpenHarmony-5.0.1-Release/src/daemon/etc/hdc.root.para">修改后developtools&#x2F;hdc&#x2F;src&#x2F;daemon&#x2F;etc&#x2F;hdc.root.para</a>.</p>
+<h4 id="system-etc-init-hdc-cfg"><a href="#system-etc-init-hdc-cfg" class="headerlink" title="&#x2F;system&#x2F;etc&#x2F;init&#x2F;hdc.cfg"></a>&#x2F;system&#x2F;etc&#x2F;init&#x2F;hdc.cfg</h4><p>我们参考OpenHarmony的代码，直接替换：<a href="https://gitee.com/openharmony/developtools_hdc/blob/OpenHarmony-5.0.1-Release/src/daemon/etc/hdcd.cfg">修改前developtools&#x2F;hdc&#x2F;src&#x2F;daemon&#x2F;etc&#x2F;hdcd.cfg</a>、<a href="https://gitee.com/openharmony/developtools_hdc/blob/OpenHarmony-5.0.1-Release/src/daemon/etc/hdcd.root.cfg">修改后developtools&#x2F;hdc&#x2F;src&#x2F;daemon&#x2F;etc&#x2F;hdcd.root.cfg</a></p>
+<p>大家如果对比在两个cfg，root版本相比会发现修改了hdcd进程启动的uid和selinux domain：<br>修改前：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;uid&quot; : &quot;shell&quot;</span><br><span class="line">&quot;secon&quot; : &quot;u:r:hdcd:s0&quot;</span><br></pre></td></tr></table></figure>
+<p>修改后：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;uid&quot; : &quot;root&quot;</span><br><span class="line">&quot;secon&quot; : &quot;u:r:su:s0&quot;</span><br></pre></td></tr></table></figure>
+<p>如果就这样启动，会提示找不到u:r:su:s0，很显然，user版本为了安全，也为了精简，不会编译su.te，从<a href="https://gitee.com/openharmony/security_selinux_adapter/blob/OpenHarmony-5.0.1-Release/sepolicy/ohos_policy/developtools/hdc/system/su.te">源代码base&#x2F;security&#x2F;selinux_adapter&#x2F;sepolicy&#x2F;ohos_policy&#x2F;developtools&#x2F;hdc&#x2F;system&#x2F;su.te</a>我们也很明显看到su.te中使用了debug_only宏.<br>但是通过修改system.img，增加su domain的定义，可能需要编译源码，有点麻烦，后面再尝试.<br>我使用如下临时方案：</p>
+<ul>
+<li>将hdcd.cfg的”u:r:su:s0”还原为”u:r:hdcd:s0”</li>
+<li>修改u:r:sh:s0的权限，改为permissive.</li>
+</ul>
+<h4 id="简单修改sepolicy"><a href="#简单修改sepolicy" class="headerlink" title="简单修改sepolicy"></a>简单修改sepolicy</h4><p>我们修改system&#x2F;etc&#x2F;selinux&#x2F;sepolicy_common.cil，将sh改为permissive type.</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">修改前</span><br><span class="line">(type sh)</span><br><span class="line">修改后</span><br><span class="line">(typepermissive sh)</span><br></pre></td></tr></table></figure>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>修改前：</p>
+<ul>
+<li>hdc shell id，普通的shell权限（uid 2000）</li>
+<li>setenforce 0，设置SELinux为Permissive失败</li>
+<li>ls &#x2F;data&#x2F;，没有权限访问&#x2F;data用户数据目录<br><img src="/2024/10/27/root-harmonyos-next-emultor/normal.png" alt="normal mode"></li>
+</ul>
+<p>修改后：</p>
+<ul>
+<li>hdc shell id，root权限（uid 0）</li>
+<li>setenforce 0，成功设置SELinux为Permissive</li>
+<li>ls &#x2F;data&#x2F;，成功访问&#x2F;data用户数据目录<br><img src="/2024/10/27/root-harmonyos-next-emultor/root.png" alt="root mode"></li>
+</ul>
+<h3 id="镜像下载"><a href="#镜像下载" class="headerlink" title="镜像下载"></a>镜像下载</h3><p><a href="https://github.com/wuxianlin/harmonyos_next_emulator_mod">modified HarmonyOS Next Emulator</a></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://developer.huawei.com/consumer/cn/download/deveco-studio">DevEco Studio</a><br><a href="https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/ide-emulator-faqs-V5#section172728114485">DevEco Studio QA</a></p>
+]]></content>
+      <categories>
+        <category>harmonyos</category>
+      </categories>
+      <tags>
+        <tag>harmonyos</tag>
+        <tag>root</tag>
+      </tags>
+  </entry>
 </search>
