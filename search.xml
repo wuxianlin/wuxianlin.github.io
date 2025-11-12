@@ -192,6 +192,210 @@
       </tags>
   </entry>
   <entry>
+    <title>一加13/15使用KmInstallKeybox修复attestation key+widevine RKP+attestation RKP测试</title>
+    <url>/2025/11/12/oneplus-13-15-attestation-rkp-test/</url>
+    <content><![CDATA[<p>一加手机高通平台的机型，在解锁BootLoader后，Attestation Key无法使用.  我们试试公开的修复方法. </p>
+<span id="more"></span>
+
+
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>一加手机高通平台的机型，在解锁BootLoader后，Attestation Key无法使用.<br>网上有公开使用KmInstallKeybox的写key方法<a href="https://web.archive.org/web/20250309120502/http://github.com/chiteroman/Reprogram-TEE-on-Qualcomm-devices">Reprogram-TEE-on-Qualcomm-devices</a>，我们在一加13、15进行测试.</p>
+<h2 id="测试过程"><a href="#测试过程" class="headerlink" title="测试过程"></a>测试过程</h2><h3 id="测试对象"><a href="#测试对象" class="headerlink" title="测试对象"></a>测试对象</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>一加13</th>
+<th>一加15中国大陆版</th>
+<th>一加15国际版</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Attestation Key（TEE）</td>
+<td>支持</td>
+<td>支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>Attestation RKP（TEE）</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>Attestation RKP（StrongBox)</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>WideVine L1 Key（TEE）</td>
+<td>不支持</td>
+<td>支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>WideVine L1 RKP（TEE）</td>
+<td>支持</td>
+<td>不支持</td>
+<td>支持</td>
+</tr>
+</tbody></table>
+<h3 id="测试目的"><a href="#测试目的" class="headerlink" title="测试目的"></a>测试目的</h3><p>在unlock状态下，不写ID+Key的状态，使用KmInstallKeybox仅写ID的状态，仅写Key的状态，写ID+Key的状态，lock回去的状态.</p>
+<h3 id="测试条件"><a href="#测试条件" class="headerlink" title="测试条件"></a>测试条件</h3><ul>
+<li>安装<a href="https://github.com/vvb2060/KeyAttestation">密钥认证</a>，<a href="https://play.google.com/store/apps/details?id=com.androidfung.drminfo">DRM Info</a>，ExoPlayer demo.</li>
+<li>【中国大陆版】开发者选项，打开禁止权限监控（root条件下也可以移除cn.google.services feature）.</li>
+<li>【中国大陆版】打开GMS.</li>
+<li>【位于中国大陆】科学上网.</li>
+</ul>
+<h3 id="unlock前状态：完全正常"><a href="#unlock前状态：完全正常" class="headerlink" title="unlock前状态：完全正常"></a>unlock前状态：完全正常</h3><ul>
+<li>Attestation Key、WideVine L1 Key正常：支持的机型均正常.</li>
+<li>Strongbox RKP正常：密钥认证，打开使用安全模块，成功获取RKP证书.</li>
+<li>TEE RKP正常：密钥认证，关闭使用安全模块，正常获取RKP证书.</li>
+<li>WideVine L1 RKP正常：ExoPlayer demo正常播放widevine L1视频，DRM Info，Security Level显示L1，SystemID显示五位数.</li>
+</ul>
+<h3 id="unlock后-修复前："><a href="#unlock后-修复前：" class="headerlink" title="unlock后+修复前："></a>unlock后+修复前：</h3><ul>
+<li>Attestation Key异常：支持的机型不正常、无法使用.</li>
+<li>WideVine L1 Key正常：支持的机型均正常.</li>
+<li>Strongbox RKP正常：密钥认证，打开使用安全模块，成功获取RKP证书.</li>
+<li>TEE RKP异常：密钥认证，关闭使用安全模块，无法获取RKP证书.</li>
+<li>WideVine L1 RKP异常：ExoPlayer demo无法播放widevine L1视频，DRM Info，Security Level显示L1，但SystemID显示2147483647.</li>
+</ul>
+<h3 id="修复ID"><a href="#修复ID" class="headerlink" title="修复ID"></a>修复ID</h3><ul>
+<li>一加13修复ID步骤</li>
+</ul>
+<p>执行</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">adb shell</span><br><span class="line">su</span><br><span class="line"><span class="built_in">dd</span> <span class="keyword">if</span>=/dev/block/by-name/persist of=/sdcard/persist_orig.img</span><br><span class="line">LD_LIBRARY_PATH=/vendor/lib64/hw KmInstallKeybox Keybox_file Device_ID <span class="literal">true</span> rkp</span><br><span class="line"><span class="built_in">dd</span> <span class="keyword">if</span>=/dev/block/by-name/persist of=/sdcard/persist_provisioned_device_id.img</span><br></pre></td></tr></table></figure>
+<p>提示：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">qmi_client_send_msg_sync success for get dev_ser_num 0</span><br><span class="line">Imei: 860000000000000</span><br><span class="line">qmi_client_send_msg_sync success for get dev_ser_num 1</span><br><span class="line">Imei: 860000000000000</span><br><span class="line">Brand: OnePlus</span><br><span class="line">Device: OP5D0DL1</span><br><span class="line">Product: PJZ110</span><br><span class="line">SerialNum: 00000000</span><br><span class="line">Manufacturer: OnePlus</span><br><span class="line">Model: PJZ110</span><br><span class="line">TEE done</span><br><span class="line">InstallKeybox is done!</span><br></pre></td></tr></table></figure>
+<ul>
+<li>一加15修复ID步骤<br>报错<code>/system/bin/sh: KmInstallKeybox: inaccessible or not found</code>，使用如下修复步骤：<br>下载小米17的<a href="https://dumps.tadiphone.dev/dumps/xiaomi/pudding/-/blob/missi-user-16-BP2A.250605.031.A3-OS3.0.7.0.WPCCNXM-release-keys/vendor/bin/KmInstallKeybox?ref_type=heads">KmInstallKeybox</a></li>
+</ul>
+<p>执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb push KmInstallKeybox /data/local/tmp/</span><br><span class="line">adb shell chmod 755 /data/local/tmp/KmInstallKeybox</span><br><span class="line">adb shell</span><br><span class="line">su</span><br><span class="line">dd if=/dev/block/by-name/persist of=/sdcard/persist_orig.img</span><br><span class="line">LD_LIBRARY_PATH=/vendor/lib64/hw /data/local/tmp/KmInstallKeybox Keybox_file Device_ID true true</span><br><span class="line">dd if=/dev/block/by-name/persist of=/sdcard/persist_provisioned_device_id.img</span><br></pre></td></tr></table></figure>
+<p>提示：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Remote Key Provisioning is used, keybox provisioning is not needed.</span><br><span class="line">AttestationIdInfo &#123;</span><br><span class="line">brand: &quot;OnePlus&quot;,</span><br><span class="line">device: &quot;OP60FFL1&quot;,</span><br><span class="line">product: &quot;PLK110&quot;,</span><br><span class="line">serial: &quot;XXXXXXXXXXXXXXXX&quot;,</span><br><span class="line">imei: &quot;860000000000000&quot;,</span><br><span class="line">imei2: &quot;860000000000000&quot;,</span><br><span class="line">meid: &quot;&quot;,</span><br><span class="line">meid2: None,</span><br><span class="line">manufacturer: &quot;OnePlus&quot;,</span><br><span class="line">model: &quot;PLK110&quot;,</span><br><span class="line">&#125;</span><br><span class="line">Device info provisioning complete.</span><br></pre></td></tr></table></figure>
+<p>获取备份好的persist，用于对比分析，以备不时之需：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb pull /sdcard/persist_orig.img</span><br><span class="line">adb pull /sdcard/persist_provisioned_device_id.img</span><br></pre></td></tr></table></figure>
+<ul>
+<li>对比分析：<br>对比发现，persist分区(挂载到&#x2F;mnt&#x2F;vendor&#x2F;persist&#x2F;)新增了如下目录，其下新增了很多个文件：<br>目录：<br><code>data/DdHdVQd1FIOARksZgXG27GJ1A5UjYCGhP-ZoGvseqsY_Alt</code><br>文件(已过滤同名的.bak文件)：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">+Qs4yZ88j-k--YQj0Ve4</span><br><span class="line">1YG3S3w9OuOU2238aVFF</span><br><span class="line">4gHVa+HMBl2pMBOFougH</span><br><span class="line">6LSJ6yDG9fVaJkc7902m</span><br><span class="line">DdHdVQd1FIOARksZgXG27GJ1A5UjYCGhP-ZoGvseqsY_Alt</span><br><span class="line">F-ieW+N4WSLMDdLl0Hqm</span><br><span class="line">LPjoUbz2NHtyqKrfEcXr</span><br><span class="line">Qem31TH4hFopHC8xflqH</span><br><span class="line">dGgXvAOudYeJjDY-u8tO</span><br><span class="line">jaJisXVMZ9uDpCoodjxT</span><br><span class="line">js2MPVdkSoN224SiQCQ7</span><br><span class="line">srUGPItwZnsd6c7CvQLB</span><br><span class="line">z-CDKP4JsJUxT4GDEqd1</span><br><span class="line">zppz2LHaIfP8aLFZsea6</span><br></pre></td></tr></table></figure>
+
+<h3 id="修复ID后再次测试"><a href="#修复ID后再次测试" class="headerlink" title="修复ID后再次测试"></a>修复ID后再次测试</h3><ul>
+<li>Attestation Key异常：支持的机型不正常、无法使用（断网、不获取RKP情况下，但联网可获取RKP证书）.</li>
+<li>WideVine L1 Key正常：支持的机型均正常.</li>
+<li>Strongbox RKP正常：密钥认证，打开使用安全模块，成功获取RKP证书.</li>
+<li>TEE RKP恢复正常：密钥认证，关闭使用安全模块，正常获取RKP证书.</li>
+<li>WideVine L1 RKP恢复正常：ExoPlayer demo正常播放widevine L1视频，DRM Info，Security Level显示L1，SystemID显示五位数.</li>
+</ul>
+<h3 id="仅修复Key"><a href="#仅修复Key" class="headerlink" title="仅修复Key"></a>仅修复Key</h3><p>恢复persist，参考上述步骤，仅替换执行KmInstallKeybox命令的参数，传入合法的keybox.xml和其中的deviceid：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">LD_LIBRARY_PATH=/vendor/lib64/hw KmInstallKeybox Keybox_file Device_ID false</span><br></pre></td></tr></table></figure>
+<p>提示：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Number of keyboxes 1</span><br><span class="line">myDeviceID: dev</span><br><span class="line">keyboxCtx.device_id.data: dev</span><br><span class="line">KeyMaster Attestation Key Provisioning success for KeyIDdev</span><br><span class="line">TEE done</span><br><span class="line">InstallKeybox is done!</span><br></pre></td></tr></table></figure>
+<p>对比发现，persist分区(挂载到&#x2F;mnt&#x2F;vendor&#x2F;persist&#x2F;)新增了如下目录，其下新增了2个文件：<br>目录：<br><code>data/DdHdVQd1FIOARksZgXG27GJ1A5UjYCGhP-ZoGvseqsY_Alt</code><br>文件(已过滤同名的.bak文件)：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">5r5LgWqAGkK7pkbwDExz</span><br><span class="line">DdHdVQd1FIOARksZgXG27GJ1A5UjYCGhP-ZoGvseqsY_Alt</span><br></pre></td></tr></table></figure>
+
+<h3 id="仅修复Key后测试"><a href="#仅修复Key后测试" class="headerlink" title="仅修复Key后测试"></a>仅修复Key后测试</h3><ul>
+<li>Attestation Key半正常：ID证明不可用.</li>
+</ul>
+<h3 id="修复Key-ID"><a href="#修复Key-ID" class="headerlink" title="修复Key+ID"></a>修复Key+ID</h3><p>恢复persist，参考上述步骤，仅替换执行KmInstallKeybox命令的参数，传入合法的keybox.xml和其中的deviceid：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">LD_LIBRARY_PATH=/vendor/lib64/hw KmInstallKeybox Keybox_file Device_ID true</span><br></pre></td></tr></table></figure>
+<p>对比发现persist分区(挂载到&#x2F;mnt&#x2F;vendor&#x2F;persist&#x2F;)新增了的目录和文件就是上述单独修复过程的合集.</p>
+<h3 id="修复Key-ID后再次测试"><a href="#修复Key-ID后再次测试" class="headerlink" title="修复Key+ID后再次测试"></a>修复Key+ID后再次测试</h3><ul>
+<li>Attestation Key正常：正常可用（断网、不获取RKP情况下），但依赖写入的KEY的有效性.</li>
+<li>WideVine L1 Key正常：支持的机型均正常.</li>
+<li>Strongbox RKP正常：密钥认证，打开使用安全模块，成功获取RKP证书.</li>
+<li>TEE RKP恢复正常：密钥认证，关闭使用安全模块，正常获取RKP证书.</li>
+<li>WideVine L1 RKP恢复正常：ExoPlayer demo正常播放widevine L1视频，DRM Info，Security Level显示L1，SystemID显示五位数.</li>
+</ul>
+<h3 id="lock-bootloader后再次测试："><a href="#lock-bootloader后再次测试：" class="headerlink" title="lock bootloader后再次测试："></a>lock bootloader后再次测试：</h3><p>完全正常，未受到任何影响.</p>
+<h2 id="分析与总结"><a href="#分析与总结" class="headerlink" title="分析与总结"></a>分析与总结</h2><h3 id="命令解释"><a href="#命令解释" class="headerlink" title="命令解释"></a>命令解释</h3><p>一加13的KmInstallKeybox:</p>
+<ul>
+<li>KmInstallKeybox Keybox_file Device_ID true：写KEY+ID，将Keybox_file中Device_ID的密钥和当前读取的设备信息写入TEE.</li>
+<li>KmInstallKeybox Keybox_file Device_ID false：写KEY，将Keybox_file中Device_ID的密钥写入TEE.</li>
+<li>KmInstallKeybox Keybox_file Device_ID true rkp：写ID，仅将当前读取的设备信息写入TEE，无需传入合法的keybox.xml和其中的deviceid.</li>
+</ul>
+<p>小米17的KmInstallKeybox:</p>
+<ul>
+<li>KmInstallKeybox Keybox_file Device_ID true：写KEY+ID，将Keybox_file中Device_ID的密钥和当前读取的设备信息写入TEE.</li>
+<li>KmInstallKeybox Keybox_file Device_ID false：写KEY，将Keybox_file中Device_ID的密钥和当前读取的设备信息写入TEE.</li>
+<li>KmInstallKeybox Keybox_file Device_ID true true：写ID，仅将当前读取的设备信息写入TEE，无需传入合法的keybox.xml和其中的deviceid.</li>
+</ul>
+<p>具体原理可参考github上的KmInstallKeybox相关源代码，以及该命令的帮助信息。</p>
+<h3 id="收益对比："><a href="#收益对比：" class="headerlink" title="收益对比："></a>收益对比：</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>LOCK</th>
+<th>UNLOCK默认</th>
+<th>UNLOCK+修复ID</th>
+<th>UNLOCK+仅修复KEY</th>
+<th>UNLOCK+修复KEY+ID</th>
+<th>回锁</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Attestation Key（TEE）</td>
+<td>正常</td>
+<td>异常</td>
+<td>异常，但可使用RKP替代</td>
+<td>半正常，ID证明不可用</td>
+<td>正常，但依赖写入的KEY的有效性</td>
+<td>恢复出厂</td>
+</tr>
+<tr>
+<td>Attestation RKP（TEE）</td>
+<td>正常</td>
+<td>异常</td>
+<td>正常</td>
+<td>异常</td>
+<td>正常</td>
+<td>正常</td>
+</tr>
+<tr>
+<td>Attestation RKP（StrongBox)</td>
+<td>正常</td>
+<td>正常</td>
+<td>正常</td>
+<td>正常</td>
+<td>正常</td>
+<td>正常</td>
+</tr>
+<tr>
+<td>WideVine L1 Key（TEE）</td>
+<td>正常</td>
+<td>正常</td>
+<td>正常</td>
+<td>正常</td>
+<td>正常</td>
+<td>正常</td>
+</tr>
+<tr>
+<td>WideVine L1 RKP（TEE）</td>
+<td>正常</td>
+<td>异常</td>
+<td>正常</td>
+<td>异常</td>
+<td>正常</td>
+<td>正常</td>
+</tr>
+</tbody></table>
+<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><p>总结下来，在可承担风险（KEY损坏）的条件下:</p>
+<ul>
+<li>一加13或者非中国大陆的一加新机，需使用WideVine L1的玩家：<br>可在不影响lock状态的KEY、也没有注入泄露的随时可能被吊销的密钥的情况下，修复ID，以实现Attestation RKP（TEE）和WideVine L1 RKP恢复正常，正常播放WideVine L1视频.</li>
+<li>一加15中国大陆版，强烈需要Attestation RKP（TEE）的玩家：<br>可在不影响lock状态的KEY、也没有注入泄露的随时可能被吊销的密钥的情况下，修复ID，仅新增Attestation RKP（TEE）恢复正常，但仍然只能证明自己的设备是unlock状态，针对使用StrongBox API的应用来说，与Attestation RKP（StrongBox）效果一致：但对未适配strongbox且未检查unlock状态的应用有用.</li>
+</ul>
+<h3 id="备注："><a href="#备注：" class="headerlink" title="备注："></a>备注：</h3><p>其他机型建议不要轻易尝试，特别是小米机型，有网友反馈执行KmInstallKeybox后会影响lock状态的key.<br>删除persist的新增文件夹后，测试attestation key依然可用，说明key已经写入RPMB，未发现删除方法.</p>
+<h2 id="相关链接："><a href="#相关链接：" class="headerlink" title="相关链接："></a>相关链接：</h2><p><a href="https://source.android.google.cn/docs/security/features/keystore/attestation">密钥认证和ID认证</a><br><a href="https://developer.android.google.cn/privacy-and-security/security-key-attestation">使用密钥认证功能来验证由硬件支持的密钥对</a><br><a href="https://developer.android.google.cn/google/play/integrity">Play Integrity API</a><br><a href="https://android-developers.googleblog.com/2017/09/keystore-key-attestation.html">Keystore Key Attestation</a><br><a href="https://source.android.google.cn/docs/core/ota/modular-system/remote-key-provisioning">RKP远程密钥配置</a><br><a href="https://android-developers.googleblog.com/2022/03/upgrading-android-attestation-remote.html">Upgrading Android Attestation: Remote Provisioning</a><br><a href="https://weibo.com/3322982490/5230614803645428">TEE损坏的说明：TEE环境并没有损坏，只是出厂写入的密钥不可用</a><br><a href="https://weibo.com/3322982490/5103971565571640">Play Integrity API抗议</a></p>
+]]></content>
+      <categories>
+        <category>HarmonyOS</category>
+      </categories>
+      <tags>
+        <tag>android</tag>
+        <tag>root</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>OpenHarmony 5.0 qemu 编译记录</title>
     <url>/2024/10/19/openharmony5-qemu-build/</url>
     <content><![CDATA[<p>HarmonyOS Next(Based on OpenHarmony)公测了，微信、QQ也都适配了，打算研究研究OpenHarmony，先下份代码，编译qemu镜像玩玩，没想到居然有坑，记录一下，供参考.</p>
@@ -307,9 +511,9 @@
         <category>root</category>
       </categories>
       <tags>
+        <tag>root</tag>
         <tag>OPPO</tag>
         <tag>FindX</tag>
-        <tag>root</tag>
         <tag>BootLoader</tag>
       </tags>
   </entry>
@@ -372,8 +576,8 @@
         <category>root</category>
       </categories>
       <tags>
-        <tag>OPPO</tag>
         <tag>root</tag>
+        <tag>OPPO</tag>
         <tag>BootLoader</tag>
         <tag>R17Pro</tag>
       </tags>

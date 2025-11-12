@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"wuxianlin.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="一加手机高通平台的机型，在解锁BootLoader后，Attestation Key无法使用.  我们试试公开的修复方法.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一加13&#x2F;15使用KmInstallKeybox修复attestation key+widevine RKP+attestation RKP测试">
+<meta property="og:url" content="https://wuxianlin.com/2025/11/12/oneplus-13-15-attestation-rkp-test/index.html">
+<meta property="og:site_name" content="wuxianlin">
+<meta property="og:description" content="一加手机高通平台的机型，在解锁BootLoader后，Attestation Key无法使用.  我们试试公开的修复方法.">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-11-12T11:00:00.000Z">
+<meta property="article:modified_time" content="2025-11-12T11:00:00.000Z">
+<meta property="article:author" content="wuxianlin">
+<meta property="article:tag" content="android">
+<meta property="article:tag" content="root">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://wuxianlin.com/2025/11/12/oneplus-13-15-attestation-rkp-test/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://wuxianlin.com/2025/11/12/oneplus-13-15-attestation-rkp-test/","path":"2025/11/12/oneplus-13-15-attestation-rkp-test/","title":"一加13/15使用KmInstallKeybox修复attestation key+widevine RKP+attestation RKP测试"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>一加13/15使用KmInstallKeybox修复attestation key+widevine RKP+attestation RKP测试 | wuxianlin</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">wuxianlin</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-links"><a href="/links/" rel="section"><i class="fa fa-link fa-fw"></i>链接</a></li><li class="menu-item menu-item-android"><a href="/android/" rel="section"><i class="fa fa-mobile fa-fw"></i>玩机</a></li><li class="menu-item menu-item-tv"><a href="/tv/" rel="section"><i class="fa fa-tv fa-fw"></i>电视</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E8%BF%87%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">测试过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.1.</span> <span class="nav-text">测试对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E7%9B%AE%E7%9A%84"><span class="nav-number">2.2.</span> <span class="nav-text">测试目的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E6%9D%A1%E4%BB%B6"><span class="nav-number">2.3.</span> <span class="nav-text">测试条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#unlock%E5%89%8D%E7%8A%B6%E6%80%81%EF%BC%9A%E5%AE%8C%E5%85%A8%E6%AD%A3%E5%B8%B8"><span class="nav-number">2.4.</span> <span class="nav-text">unlock前状态：完全正常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#unlock%E5%90%8E-%E4%BF%AE%E5%A4%8D%E5%89%8D%EF%BC%9A"><span class="nav-number">2.5.</span> <span class="nav-text">unlock后+修复前：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8DID"><span class="nav-number">2.6.</span> <span class="nav-text">修复ID</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8DID%E5%90%8E%E5%86%8D%E6%AC%A1%E6%B5%8B%E8%AF%95"><span class="nav-number">2.7.</span> <span class="nav-text">修复ID后再次测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%85%E4%BF%AE%E5%A4%8DKey"><span class="nav-number">2.8.</span> <span class="nav-text">仅修复Key</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%85%E4%BF%AE%E5%A4%8DKey%E5%90%8E%E6%B5%8B%E8%AF%95"><span class="nav-number">2.9.</span> <span class="nav-text">仅修复Key后测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8DKey-ID"><span class="nav-number">2.10.</span> <span class="nav-text">修复Key+ID</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E5%A4%8DKey-ID%E5%90%8E%E5%86%8D%E6%AC%A1%E6%B5%8B%E8%AF%95"><span class="nav-number">2.11.</span> <span class="nav-text">修复Key+ID后再次测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lock-bootloader%E5%90%8E%E5%86%8D%E6%AC%A1%E6%B5%8B%E8%AF%95%EF%BC%9A"><span class="nav-number">2.12.</span> <span class="nav-text">lock bootloader后再次测试：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E4%B8%8E%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">分析与总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E8%A7%A3%E9%87%8A"><span class="nav-number">3.1.</span> <span class="nav-text">命令解释</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%B6%E7%9B%8A%E5%AF%B9%E6%AF%94%EF%BC%9A"><span class="nav-number">3.2.</span> <span class="nav-text">收益对比：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="nav-number">3.3.</span> <span class="nav-text">总结：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%87%E6%B3%A8%EF%BC%9A"><span class="nav-number">3.4.</span> <span class="nav-text">备注：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E9%93%BE%E6%8E%A5%EF%BC%9A"><span class="nav-number">4.</span> <span class="nav-text">相关链接：</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">wuxianlin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wuxianlin" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wuxianlin" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wuxianlinwxl@gmail.com" title="E-Mail → mailto:wuxianlinwxl@gmail.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/wuxianlin000000" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;wuxianlin000000" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wuxianlin.com/2025/11/12/oneplus-13-15-attestation-rkp-test/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="wuxianlin">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wuxianlin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="一加13/15使用KmInstallKeybox修复attestation key+widevine RKP+attestation RKP测试 | wuxianlin">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          一加13/15使用KmInstallKeybox修复attestation key+widevine RKP+attestation RKP测试
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-11-12 19:00:00" itemprop="dateCreated datePublished" datetime="2025-11-12T19:00:00+08:00">2025-11-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/HarmonyOS/" itemprop="url" rel="index"><span itemprop="name">HarmonyOS</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>一加手机高通平台的机型，在解锁BootLoader后，Attestation Key无法使用.  我们试试公开的修复方法. </p>
+<span id="more"></span>
+
+
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>一加手机高通平台的机型，在解锁BootLoader后，Attestation Key无法使用.<br>网上有公开使用KmInstallKeybox的写key方法<a target="_blank" rel="noopener" href="https://web.archive.org/web/20250309120502/http://github.com/chiteroman/Reprogram-TEE-on-Qualcomm-devices">Reprogram-TEE-on-Qualcomm-devices</a>，我们在一加13、15进行测试.</p>
+<h2 id="测试过程"><a href="#测试过程" class="headerlink" title="测试过程"></a>测试过程</h2><h3 id="测试对象"><a href="#测试对象" class="headerlink" title="测试对象"></a>测试对象</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>一加13</th>
+<th>一加15中国大陆版</th>
+<th>一加15国际版</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Attestation Key（TEE）</td>
+<td>支持</td>
+<td>支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>Attestation RKP（TEE）</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>Attestation RKP（StrongBox)</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>WideVine L1 Key（TEE）</td>
+<td>不支持</td>
+<td>支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>WideVine L1 RKP（TEE）</td>
+<td>支持</td>
+<td>不支持</td>
+<td>支持</td>
+</tr>
+</tbody></table>
+<h3 id="测试目的"><a href="#测试目的" class="headerlink" title="测试目的"></a>测试目的</h3><p>在unlock状态下，不写ID+Key的状态，使用KmInstallKeybox仅写ID的状态，仅写Key的状态，写ID+Key的状态，lock回去的状态.</p>
+<h3 id="测试条件"><a href="#测试条件" class="headerlink" title="测试条件"></a>测试条件</h3><ul>
+<li>安装<a target="_blank" rel="noopener" href="https://github.com/vvb2060/KeyAttestation">密钥认证</a>，<a target="_blank" rel="noopener" href="https://play.google.com/store/apps/details?id=com.androidfung.drminfo">DRM Info</a>，ExoPlayer demo.</li>
+<li>【中国大陆版】开发者选项，打开禁止权限监控（root条件下也可以移除cn.google.services feature）.</li>
+<li>【中国大陆版】打开GMS.</li>
+<li>【位于中国大陆】科学上网.</li>
+</ul>
+<h3 id="unlock前状态：完全正常"><a href="#unlock前状态：完全正常" class="headerlink" title="unlock前状态：完全正常"></a>unlock前状态：完全正常</h3><ul>
+<li>Attestation Key、WideVine L1 Key正常：支持的机型均正常.</li>
+<li>Strongbox RKP正常：密钥认证，打开使用安全模块，成功获取RKP证书.</li>
+<li>TEE RKP正常：密钥认证，关闭使用安全模块，正常获取RKP证书.</li>
+<li>WideVine L1 RKP正常：ExoPlayer demo正常播放widevine L1视频，DRM Info，Security Level显示L1，SystemID显示五位数.</li>
+</ul>
+<h3 id="unlock后-修复前："><a href="#unlock后-修复前：" class="headerlink" title="unlock后+修复前："></a>unlock后+修复前：</h3><ul>
+<li>Attestation Key异常：支持的机型不正常、无法使用.</li>
+<li>WideVine L1 Key正常：支持的机型均正常.</li>
+<li>Strongbox RKP正常：密钥认证，打开使用安全模块，成功获取RKP证书.</li>
+<li>TEE RKP异常：密钥认证，关闭使用安全模块，无法获取RKP证书.</li>
+<li>WideVine L1 RKP异常：ExoPlayer demo无法播放widevine L1视频，DRM Info，Security Level显示L1，但SystemID显示2147483647.</li>
+</ul>
+<h3 id="修复ID"><a href="#修复ID" class="headerlink" title="修复ID"></a>修复ID</h3><ul>
+<li>一加13修复ID步骤</li>
+</ul>
+<p>执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">adb shell</span><br><span class="line">su</span><br><span class="line"><span class="built_in">dd</span> <span class="keyword">if</span>=/dev/block/by-name/persist of=/sdcard/persist_orig.img</span><br><span class="line">LD_LIBRARY_PATH=/vendor/lib64/hw KmInstallKeybox Keybox_file Device_ID <span class="literal">true</span> rkp</span><br><span class="line"><span class="built_in">dd</span> <span class="keyword">if</span>=/dev/block/by-name/persist of=/sdcard/persist_provisioned_device_id.img</span><br></pre></td></tr></table></figure>
+<p>提示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">qmi_client_send_msg_sync success for get dev_ser_num 0</span><br><span class="line">Imei: 860000000000000</span><br><span class="line">qmi_client_send_msg_sync success for get dev_ser_num 1</span><br><span class="line">Imei: 860000000000000</span><br><span class="line">Brand: OnePlus</span><br><span class="line">Device: OP5D0DL1</span><br><span class="line">Product: PJZ110</span><br><span class="line">SerialNum: 00000000</span><br><span class="line">Manufacturer: OnePlus</span><br><span class="line">Model: PJZ110</span><br><span class="line">TEE done</span><br><span class="line">InstallKeybox is done!</span><br></pre></td></tr></table></figure>
+<ul>
+<li>一加15修复ID步骤<br>报错<code>/system/bin/sh: KmInstallKeybox: inaccessible or not found</code>，使用如下修复步骤：<br>下载小米17的<a target="_blank" rel="noopener" href="https://dumps.tadiphone.dev/dumps/xiaomi/pudding/-/blob/missi-user-16-BP2A.250605.031.A3-OS3.0.7.0.WPCCNXM-release-keys/vendor/bin/KmInstallKeybox?ref_type=heads">KmInstallKeybox</a></li>
+</ul>
+<p>执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">adb push KmInstallKeybox /data/local/tmp/</span><br><span class="line">adb shell chmod 755 /data/local/tmp/KmInstallKeybox</span><br><span class="line">adb shell</span><br><span class="line">su</span><br><span class="line">dd if=/dev/block/by-name/persist of=/sdcard/persist_orig.img</span><br><span class="line">LD_LIBRARY_PATH=/vendor/lib64/hw /data/local/tmp/KmInstallKeybox Keybox_file Device_ID true true</span><br><span class="line">dd if=/dev/block/by-name/persist of=/sdcard/persist_provisioned_device_id.img</span><br></pre></td></tr></table></figure>
+<p>提示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Remote Key Provisioning is used, keybox provisioning is not needed.</span><br><span class="line">AttestationIdInfo &#123;</span><br><span class="line">brand: &quot;OnePlus&quot;,</span><br><span class="line">device: &quot;OP60FFL1&quot;,</span><br><span class="line">product: &quot;PLK110&quot;,</span><br><span class="line">serial: &quot;XXXXXXXXXXXXXXXX&quot;,</span><br><span class="line">imei: &quot;860000000000000&quot;,</span><br><span class="line">imei2: &quot;860000000000000&quot;,</span><br><span class="line">meid: &quot;&quot;,</span><br><span class="line">meid2: None,</span><br><span class="line">manufacturer: &quot;OnePlus&quot;,</span><br><span class="line">model: &quot;PLK110&quot;,</span><br><span class="line">&#125;</span><br><span class="line">Device info provisioning complete.</span><br></pre></td></tr></table></figure>
+<p>获取备份好的persist，用于对比分析，以备不时之需：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb pull /sdcard/persist_orig.img</span><br><span class="line">adb pull /sdcard/persist_provisioned_device_id.img</span><br></pre></td></tr></table></figure>
+<ul>
+<li>对比分析：<br>对比发现，persist分区(挂载到&#x2F;mnt&#x2F;vendor&#x2F;persist&#x2F;)新增了如下目录，其下新增了很多个文件：<br>目录：<br><code>data/DdHdVQd1FIOARksZgXG27GJ1A5UjYCGhP-ZoGvseqsY_Alt</code><br>文件(已过滤同名的.bak文件)：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">+Qs4yZ88j-k--YQj0Ve4</span><br><span class="line">1YG3S3w9OuOU2238aVFF</span><br><span class="line">4gHVa+HMBl2pMBOFougH</span><br><span class="line">6LSJ6yDG9fVaJkc7902m</span><br><span class="line">DdHdVQd1FIOARksZgXG27GJ1A5UjYCGhP-ZoGvseqsY_Alt</span><br><span class="line">F-ieW+N4WSLMDdLl0Hqm</span><br><span class="line">LPjoUbz2NHtyqKrfEcXr</span><br><span class="line">Qem31TH4hFopHC8xflqH</span><br><span class="line">dGgXvAOudYeJjDY-u8tO</span><br><span class="line">jaJisXVMZ9uDpCoodjxT</span><br><span class="line">js2MPVdkSoN224SiQCQ7</span><br><span class="line">srUGPItwZnsd6c7CvQLB</span><br><span class="line">z-CDKP4JsJUxT4GDEqd1</span><br><span class="line">zppz2LHaIfP8aLFZsea6</span><br></pre></td></tr></table></figure>
+
+<h3 id="修复ID后再次测试"><a href="#修复ID后再次测试" class="headerlink" title="修复ID后再次测试"></a>修复ID后再次测试</h3><ul>
+<li>Attestation Key异常：支持的机型不正常、无法使用（断网、不获取RKP情况下，但联网可获取RKP证书）.</li>
+<li>WideVine L1 Key正常：支持的机型均正常.</li>
+<li>Strongbox RKP正常：密钥认证，打开使用安全模块，成功获取RKP证书.</li>
+<li>TEE RKP恢复正常：密钥认证，关闭使用安全模块，正常获取RKP证书.</li>
+<li>WideVine L1 RKP恢复正常：ExoPlayer demo正常播放widevine L1视频，DRM Info，Security Level显示L1，SystemID显示五位数.</li>
+</ul>
+<h3 id="仅修复Key"><a href="#仅修复Key" class="headerlink" title="仅修复Key"></a>仅修复Key</h3><p>恢复persist，参考上述步骤，仅替换执行KmInstallKeybox命令的参数，传入合法的keybox.xml和其中的deviceid：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LD_LIBRARY_PATH=/vendor/lib64/hw KmInstallKeybox Keybox_file Device_ID false</span><br></pre></td></tr></table></figure>
+<p>提示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Number of keyboxes 1</span><br><span class="line">myDeviceID: dev</span><br><span class="line">keyboxCtx.device_id.data: dev</span><br><span class="line">KeyMaster Attestation Key Provisioning success for KeyIDdev</span><br><span class="line">TEE done</span><br><span class="line">InstallKeybox is done!</span><br></pre></td></tr></table></figure>
+<p>对比发现，persist分区(挂载到&#x2F;mnt&#x2F;vendor&#x2F;persist&#x2F;)新增了如下目录，其下新增了2个文件：<br>目录：<br><code>data/DdHdVQd1FIOARksZgXG27GJ1A5UjYCGhP-ZoGvseqsY_Alt</code><br>文件(已过滤同名的.bak文件)：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">5r5LgWqAGkK7pkbwDExz</span><br><span class="line">DdHdVQd1FIOARksZgXG27GJ1A5UjYCGhP-ZoGvseqsY_Alt</span><br></pre></td></tr></table></figure>
+
+<h3 id="仅修复Key后测试"><a href="#仅修复Key后测试" class="headerlink" title="仅修复Key后测试"></a>仅修复Key后测试</h3><ul>
+<li>Attestation Key半正常：ID证明不可用.</li>
+</ul>
+<h3 id="修复Key-ID"><a href="#修复Key-ID" class="headerlink" title="修复Key+ID"></a>修复Key+ID</h3><p>恢复persist，参考上述步骤，仅替换执行KmInstallKeybox命令的参数，传入合法的keybox.xml和其中的deviceid：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LD_LIBRARY_PATH=/vendor/lib64/hw KmInstallKeybox Keybox_file Device_ID true</span><br></pre></td></tr></table></figure>
+<p>对比发现persist分区(挂载到&#x2F;mnt&#x2F;vendor&#x2F;persist&#x2F;)新增了的目录和文件就是上述单独修复过程的合集.</p>
+<h3 id="修复Key-ID后再次测试"><a href="#修复Key-ID后再次测试" class="headerlink" title="修复Key+ID后再次测试"></a>修复Key+ID后再次测试</h3><ul>
+<li>Attestation Key正常：正常可用（断网、不获取RKP情况下），但依赖写入的KEY的有效性.</li>
+<li>WideVine L1 Key正常：支持的机型均正常.</li>
+<li>Strongbox RKP正常：密钥认证，打开使用安全模块，成功获取RKP证书.</li>
+<li>TEE RKP恢复正常：密钥认证，关闭使用安全模块，正常获取RKP证书.</li>
+<li>WideVine L1 RKP恢复正常：ExoPlayer demo正常播放widevine L1视频，DRM Info，Security Level显示L1，SystemID显示五位数.</li>
+</ul>
+<h3 id="lock-bootloader后再次测试："><a href="#lock-bootloader后再次测试：" class="headerlink" title="lock bootloader后再次测试："></a>lock bootloader后再次测试：</h3><p>完全正常，未受到任何影响.</p>
+<h2 id="分析与总结"><a href="#分析与总结" class="headerlink" title="分析与总结"></a>分析与总结</h2><h3 id="命令解释"><a href="#命令解释" class="headerlink" title="命令解释"></a>命令解释</h3><p>一加13的KmInstallKeybox:</p>
+<ul>
+<li>KmInstallKeybox Keybox_file Device_ID true：写KEY+ID，将Keybox_file中Device_ID的密钥和当前读取的设备信息写入TEE.</li>
+<li>KmInstallKeybox Keybox_file Device_ID false：写KEY，将Keybox_file中Device_ID的密钥写入TEE.</li>
+<li>KmInstallKeybox Keybox_file Device_ID true rkp：写ID，仅将当前读取的设备信息写入TEE，无需传入合法的keybox.xml和其中的deviceid.</li>
+</ul>
+<p>小米17的KmInstallKeybox:</p>
+<ul>
+<li>KmInstallKeybox Keybox_file Device_ID true：写KEY+ID，将Keybox_file中Device_ID的密钥和当前读取的设备信息写入TEE.</li>
+<li>KmInstallKeybox Keybox_file Device_ID false：写KEY，将Keybox_file中Device_ID的密钥和当前读取的设备信息写入TEE.</li>
+<li>KmInstallKeybox Keybox_file Device_ID true true：写ID，仅将当前读取的设备信息写入TEE，无需传入合法的keybox.xml和其中的deviceid.</li>
+</ul>
+<p>具体原理可参考github上的KmInstallKeybox相关源代码，以及该命令的帮助信息。</p>
+<h3 id="收益对比："><a href="#收益对比：" class="headerlink" title="收益对比："></a>收益对比：</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>LOCK</th>
+<th>UNLOCK默认</th>
+<th>UNLOCK+修复ID</th>
+<th>UNLOCK+仅修复KEY</th>
+<th>UNLOCK+修复KEY+ID</th>
+<th>回锁</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Attestation Key（TEE）</td>
+<td>正常</td>
+<td>异常</td>
+<td>异常，但可使用RKP替代</td>
+<td>半正常，ID证明不可用</td>
+<td>正常，但依赖写入的KEY的有效性</td>
+<td>恢复出厂</td>
+</tr>
+<tr>
+<td>Attestation RKP（TEE）</td>
+<td>正常</td>
+<td>异常</td>
+<td>正常</td>
+<td>异常</td>
+<td>正常</td>
+<td>正常</td>
+</tr>
+<tr>
+<td>Attestation RKP（StrongBox)</td>
+<td>正常</td>
+<td>正常</td>
+<td>正常</td>
+<td>正常</td>
+<td>正常</td>
+<td>正常</td>
+</tr>
+<tr>
+<td>WideVine L1 Key（TEE）</td>
+<td>正常</td>
+<td>正常</td>
+<td>正常</td>
+<td>正常</td>
+<td>正常</td>
+<td>正常</td>
+</tr>
+<tr>
+<td>WideVine L1 RKP（TEE）</td>
+<td>正常</td>
+<td>异常</td>
+<td>正常</td>
+<td>异常</td>
+<td>正常</td>
+<td>正常</td>
+</tr>
+</tbody></table>
+<h3 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h3><p>总结下来，在可承担风险（KEY损坏）的条件下:</p>
+<ul>
+<li>一加13或者非中国大陆的一加新机，需使用WideVine L1的玩家：<br>可在不影响lock状态的KEY、也没有注入泄露的随时可能被吊销的密钥的情况下，修复ID，以实现Attestation RKP（TEE）和WideVine L1 RKP恢复正常，正常播放WideVine L1视频.</li>
+<li>一加15中国大陆版，强烈需要Attestation RKP（TEE）的玩家：<br>可在不影响lock状态的KEY、也没有注入泄露的随时可能被吊销的密钥的情况下，修复ID，仅新增Attestation RKP（TEE）恢复正常，但仍然只能证明自己的设备是unlock状态，针对使用StrongBox API的应用来说，与Attestation RKP（StrongBox）效果一致：但对未适配strongbox且未检查unlock状态的应用有用.</li>
+</ul>
+<h3 id="备注："><a href="#备注：" class="headerlink" title="备注："></a>备注：</h3><p>其他机型建议不要轻易尝试，特别是小米机型，有网友反馈执行KmInstallKeybox后会影响lock状态的key.<br>删除persist的新增文件夹后，测试attestation key依然可用，说明key已经写入RPMB，未发现删除方法.</p>
+<h2 id="相关链接："><a href="#相关链接：" class="headerlink" title="相关链接："></a>相关链接：</h2><p><a target="_blank" rel="noopener" href="https://source.android.google.cn/docs/security/features/keystore/attestation">密钥认证和ID认证</a><br><a target="_blank" rel="noopener" href="https://developer.android.google.cn/privacy-and-security/security-key-attestation">使用密钥认证功能来验证由硬件支持的密钥对</a><br><a target="_blank" rel="noopener" href="https://developer.android.google.cn/google/play/integrity">Play Integrity API</a><br><a target="_blank" rel="noopener" href="https://android-developers.googleblog.com/2017/09/keystore-key-attestation.html">Keystore Key Attestation</a><br><a target="_blank" rel="noopener" href="https://source.android.google.cn/docs/core/ota/modular-system/remote-key-provisioning">RKP远程密钥配置</a><br><a target="_blank" rel="noopener" href="https://android-developers.googleblog.com/2022/03/upgrading-android-attestation-remote.html">Upgrading Android Attestation: Remote Provisioning</a><br><a target="_blank" rel="noopener" href="https://weibo.com/3322982490/5230614803645428">TEE损坏的说明：TEE环境并没有损坏，只是出厂写入的密钥不可用</a><br><a target="_blank" rel="noopener" href="https://weibo.com/3322982490/5103971565571640">Play Integrity API抗议</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="wuxianlin 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="wuxianlin 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/android/" rel="tag"># android</a>
+              <a href="/tags/root/" rel="tag"># root</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/10/27/root-harmonyos-next-emultor/" rel="prev" title="HarmonyOS Next 模拟器 root">
+                  <i class="fa fa-angle-left"></i> HarmonyOS Next 模拟器 root
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC80MDkwMS8xNzQyNg=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2015 – 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">wuxianlin</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+</body>
+</html>
