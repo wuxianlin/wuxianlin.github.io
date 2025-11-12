@@ -388,7 +388,7 @@
 <h2 id="相关链接："><a href="#相关链接：" class="headerlink" title="相关链接："></a>相关链接：</h2><p><a href="https://source.android.google.cn/docs/security/features/keystore/attestation">密钥认证和ID认证</a><br><a href="https://developer.android.google.cn/privacy-and-security/security-key-attestation">使用密钥认证功能来验证由硬件支持的密钥对</a><br><a href="https://developer.android.google.cn/google/play/integrity">Play Integrity API</a><br><a href="https://android-developers.googleblog.com/2017/09/keystore-key-attestation.html">Keystore Key Attestation</a><br><a href="https://source.android.google.cn/docs/core/ota/modular-system/remote-key-provisioning">RKP远程密钥配置</a><br><a href="https://android-developers.googleblog.com/2022/03/upgrading-android-attestation-remote.html">Upgrading Android Attestation: Remote Provisioning</a><br><a href="https://weibo.com/3322982490/5230614803645428">TEE损坏的说明：TEE环境并没有损坏，只是出厂写入的密钥不可用</a><br><a href="https://weibo.com/3322982490/5103971565571640">Play Integrity API抗议</a></p>
 ]]></content>
       <categories>
-        <category>HarmonyOS</category>
+        <category>Android</category>
       </categories>
       <tags>
         <tag>android</tag>
