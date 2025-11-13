@@ -317,7 +317,7 @@
 <p>小米17的KmInstallKeybox:</p>
 <ul>
 <li>KmInstallKeybox Keybox_file Device_ID true：写KEY+ID，将Keybox_file中Device_ID的密钥和当前读取的设备信息写入TEE.</li>
-<li>KmInstallKeybox Keybox_file Device_ID false：写KEY，将Keybox_file中Device_ID的密钥和当前读取的设备信息写入TEE.</li>
+<li>KmInstallKeybox Keybox_file Device_ID false：写KEY，将Keybox_file中Device_ID的密钥写入TEE.</li>
 <li>KmInstallKeybox Keybox_file Device_ID true true：写ID，仅将当前读取的设备信息写入TEE，无需传入合法的keybox.xml和其中的deviceid.</li>
 </ul>
 <p>具体原理可参考github上的KmInstallKeybox相关源代码，以及该命令的帮助信息。</p>
